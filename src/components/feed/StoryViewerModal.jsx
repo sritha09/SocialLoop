@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { X, Eye, Heart, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 
-export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClose, onIndexChange }) => {
+export const StoryViewerModal = ({ stories = [], story = null, activeIndex = 0, isOpen, onClose, onIndexChange }) => {
   const { viewStory } = useData();
 
-  const currentStory = stories[activeIndex] || stories[0];
+  // Handle both stories array or single story object
+  const storyList = stories.length > 0 ? stories : story ? [story] : [];
+  const currentIndex = Math.min(activeIndex, Math.max(0, storyList.length - 1));
+  const currentStory = storyList[currentIndex];
 
   useEffect(() => {
     if (isOpen && currentStory) {
@@ -17,21 +20,21 @@ export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClos
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, activeIndex, currentStory]);
+  }, [isOpen, currentIndex, currentStory]);
 
   if (!isOpen || !currentStory) return null;
 
   const handlePrev = (e) => {
     e?.stopPropagation();
-    if (activeIndex > 0) {
-      onIndexChange(activeIndex - 1);
+    if (currentIndex > 0 && onIndexChange) {
+      onIndexChange(currentIndex - 1);
     }
   };
 
   const handleNext = (e) => {
     e?.stopPropagation();
-    if (activeIndex < stories.length - 1) {
-      onIndexChange(activeIndex + 1);
+    if (currentIndex < storyList.length - 1 && onIndexChange) {
+      onIndexChange(currentIndex + 1);
     } else {
       onClose();
     }
@@ -40,17 +43,17 @@ export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClos
   const isVideo = currentStory.mediaType === 'video' || currentStory.mediaUrl?.match(/\.(mp4|mov|webm)$/i);
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-sm h-[80vh] my-auto rounded-3xl overflow-hidden shadow-2xl bg-black flex flex-col justify-between border border-white/10 group">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md overflow-hidden animate-fadeIn select-none">
+      <div className="relative w-full max-w-sm h-[85vh] max-h-[700px] my-auto rounded-3xl overflow-hidden shadow-2xl bg-black flex flex-col justify-between border border-white/10 group">
         
         {/* TOP PROGRESS BARS & AUTHOR HEADER */}
-        <div className="p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-20 space-y-3">
+        <div className="p-4 bg-gradient-to-b from-black/90 via-black/40 to-transparent z-20 space-y-3">
           {/* PROGRESS BARS FOR ALL STORIES */}
           <div className="flex gap-1.5 w-full">
-            {stories.map((s, idx) => (
+            {storyList.map((s, idx) => (
               <div key={s.id || idx} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
                 <div className={`h-full bg-white transition-all ${
-                  idx < activeIndex ? 'w-full' : idx === activeIndex ? 'w-full animate-[progress_5s_linear_forwards]' : 'w-0'
+                  idx < currentIndex ? 'w-full' : idx === currentIndex ? 'w-full animate-[progress_5s_linear_forwards]' : 'w-0'
                 }`}></div>
               </div>
             ))}
@@ -67,7 +70,7 @@ export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClos
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors z-30"
+              className="p-1.5 rounded-full bg-black/50 text-white hover:bg-rose-500 transition-colors z-30"
             >
               <X className="w-5 h-5" />
             </button>
@@ -97,8 +100,8 @@ export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClos
           onClick={handlePrev}
           className="absolute left-0 top-1/4 bottom-1/4 w-1/3 z-20 cursor-pointer flex items-center justify-start pl-2"
         >
-          {activeIndex > 0 && (
-            <button className="p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors hidden group-hover:flex">
+          {currentIndex > 0 && (
+            <button className="p-1.5 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors hidden group-hover:flex">
               <ChevronLeft className="w-5 h-5" />
             </button>
           )}
@@ -108,7 +111,7 @@ export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClos
           onClick={handleNext}
           className="absolute right-0 top-1/4 bottom-1/4 w-1/3 z-20 cursor-pointer flex items-center justify-end pr-2"
         >
-          <button className="p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors hidden group-hover:flex">
+          <button className="p-1.5 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors hidden group-hover:flex">
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
@@ -124,7 +127,7 @@ export const StoryViewerModal = ({ stories = [], activeIndex = 0, isOpen, onClos
           <div className="flex items-center justify-between text-xs text-white/80 pt-1">
             <div className="flex items-center gap-1.5">
               <Eye className="w-4 h-4 text-emerald-400" />
-              <span className="font-bold text-white text-xs">{currentStory.viewsCount || 342} views</span>
+              <span className="font-bold text-white text-xs">{currentStory.viewsCount || 1} views</span>
             </div>
 
             <div className="flex items-center gap-2">

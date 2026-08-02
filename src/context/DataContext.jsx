@@ -367,6 +367,14 @@ export const DataProvider = ({ children }) => {
     );
   };
 
+  // Filter active 24-hour stories
+  const activeStories = stories.filter(s => {
+    if (!s.createdAt) return true;
+    const storyTime = new Date(s.createdAt).getTime();
+    const now = Date.now();
+    return now - storyTime < 24 * 60 * 60 * 1000;
+  });
+
   return (
     <DataContext.Provider value={{
       campaigns,
@@ -392,7 +400,7 @@ export const DataProvider = ({ children }) => {
       addPost,
       likePost,
       commentPost,
-      stories,
+      stories: activeStories,
       addStory,
       viewStory,
       followingMap,

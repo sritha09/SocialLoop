@@ -46,9 +46,17 @@ export const AuthProvider = ({ children }) => {
     const id = (userData.role === 'business' ? 'b' : 'i') + Date.now();
     const newUser = {
       id,
+      followersCount: 0,
+      followingCount: 0,
+      postsCount: 0,
+      storiesCount: 0,
+      collaborationsCount: 0,
+      campaignsCount: 0,
+      notificationsCount: 0,
+      messagesCount: 0,
       rating: 5.0,
       reviewsCount: 0,
-      completionScore: 85,
+      completionScore: 100,
       isVerified: false,
       ...userData,
     };
