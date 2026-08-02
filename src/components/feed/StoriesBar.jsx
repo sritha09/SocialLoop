@@ -30,10 +30,10 @@ export const StoriesBar = ({ openStoryViewer, openCreateStoryModal }) => {
         </div>
 
         {/* STORIES LIST */}
-        {stories.map((story) => (
+        {stories.map((story, idx) => (
           <div
             key={story.id}
-            onClick={() => openStoryViewer(story)}
+            onClick={() => openStoryViewer(story, idx)}
             className="flex flex-col items-center gap-1.5 cursor-pointer shrink-0 group"
           >
             <div className="p-0.5 rounded-full bg-gradient-to-tr from-[#6D5EF8] via-[#8B7CFF] to-pink-500 shadow-sm group-hover:scale-105 transition-transform">

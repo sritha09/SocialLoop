@@ -10,20 +10,22 @@ import { StoriesBar } from './StoriesBar';
 import { StoryViewerModal } from './StoryViewerModal';
 import { CreatePostModal } from './CreatePostModal';
 import { CreateStoryModal } from './CreateStoryModal';
+import { PostDetailModal } from './PostDetailModal';
 
 export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onChatClick }) => {
   const { currentUser, users } = useAuth();
   const { posts, campaigns, stories, likePost, commentPost, followUser, followingMap } = useData();
   const { formatCurrency } = useCurrency();
 
-  const [activeStory, setActiveStory] = useState(null);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isCreateStoryOpen, setIsCreateStoryOpen] = useState(false);
+  const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
 
-  const handleOpenStory = (story) => {
-    setActiveStory(story);
+  const handleOpenStory = (story, idx = 0) => {
+    setActiveStoryIndex(idx);
     setIsStoryViewerOpen(true);
   };
 
@@ -76,7 +78,7 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
               onClick={() => setIsCreatePostOpen(true)}
               className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-500 text-xs text-left hover:border-[#6D5EF8] border border-transparent transition-all font-medium"
             >
-              Share an update, showcase a campaign, or upload photos...
+              Share an update, showcase a campaign, or upload photos/videos...
             </button>
             <button
               onClick={() => setIsCreatePostOpen(true)}
@@ -134,19 +136,34 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                   </button>
                 </div>
 
-                {/* POST IMAGES */}
+                {/* POST IMAGES / VIDEO PREVIEW (CLICK OPENS MODAL) */}
                 {post.images?.length > 0 && (
-                  <div className="relative max-h-96 overflow-hidden bg-black">
-                    <img 
-                      src={post.images[0]} 
-                      alt="Post content" 
-                      className="w-full h-auto object-cover max-h-96" 
-                    />
+                  <div 
+                    onClick={() => setSelectedPostForDetail(post)}
+                    className="relative max-h-96 overflow-hidden bg-black cursor-pointer group"
+                  >
+                    {post.mediaTypes?.[0] === 'video' || post.images[0]?.match(/\.(mp4|mov|webm)$/i) ? (
+                      <video src={post.images[0]} className="w-full h-auto object-cover max-h-96" />
+                    ) : (
+                      <img 
+                        src={post.images[0]} 
+                        alt="Post content" 
+                        className="w-full h-auto object-cover max-h-96 group-hover:scale-[1.01] transition-transform" 
+                      />
+                    )}
+                    {post.images.length > 1 && (
+                      <span className="absolute top-3 right-3 px-2 py-1 rounded-md bg-black/70 text-white font-bold text-[10px]">
+                        +{post.images.length - 1} photos
+                      </span>
+                    )}
                   </div>
                 )}
 
                 {/* POST CAPTION & HASHTAGS */}
-                <div className="px-4 space-y-2 text-xs sm:text-sm">
+                <div 
+                  onClick={() => setSelectedPostForDetail(post)}
+                  className="px-4 space-y-2 text-xs sm:text-sm cursor-pointer"
+                >
                   <p className="text-slate-800 dark:text-slate-200 leading-relaxed">
                     {post.caption}
                   </p>
@@ -172,10 +189,13 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                       <span>{post.likesCount || 0}</span>
                     </button>
 
-                    <span className="flex items-center gap-1.5">
+                    <button 
+                      onClick={() => setSelectedPostForDetail(post)}
+                      className="flex items-center gap-1.5 hover:text-[#6D5EF8] transition-colors"
+                    >
                       <MessageCircle className="w-4 h-4 text-[#6D5EF8]" />
                       <span>{post.commentsCount || 0}</span>
-                    </span>
+                    </button>
 
                     <button className="flex items-center gap-1.5 hover:text-[#6D5EF8] transition-colors">
                       <Share2 className="w-4 h-4" />
@@ -191,12 +211,20 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                 {/* COMMENTS LIST */}
                 {post.comments?.length > 0 && (
                   <div className="px-4 pb-3 space-y-2 bg-slate-50/50 dark:bg-slate-900/30 text-xs">
-                    {post.comments.map(c => (
+                    {post.comments.slice(0, 2).map(c => (
                       <div key={c.id} className="flex items-start gap-2 pt-1">
                         <span className="font-bold text-slate-900 dark:text-white shrink-0">{c.authorName}:</span>
                         <span className="text-slate-600 dark:text-slate-300">{c.text}</span>
                       </div>
                     ))}
+                    {post.comments.length > 2 && (
+                      <button 
+                        onClick={() => setSelectedPostForDetail(post)}
+                        className="text-[11px] font-bold text-[#6D5EF8] hover:underline pt-1"
+                      >
+                        View all {post.comments.length} comments
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -328,9 +356,11 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
 
       {/* MODALS */}
       <StoryViewerModal 
-        story={activeStory} 
+        stories={stories}
+        activeIndex={activeStoryIndex}
         isOpen={isStoryViewerOpen} 
-        onClose={() => setIsStoryViewerOpen(false)} 
+        onClose={() => setIsStoryViewerOpen(false)}
+        onIndexChange={setActiveStoryIndex}
       />
 
       <CreatePostModal 
@@ -341,6 +371,12 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
       <CreateStoryModal 
         isOpen={isCreateStoryOpen} 
         onClose={() => setIsCreateStoryOpen(false)} 
+      />
+
+      <PostDetailModal
+        post={selectedPostForDetail}
+        isOpen={!!selectedPostForDetail}
+        onClose={() => setSelectedPostForDetail(null)}
       />
 
     </div>

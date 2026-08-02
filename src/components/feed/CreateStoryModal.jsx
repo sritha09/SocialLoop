@@ -9,6 +9,7 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
 
   const [caption, setCaption] = useState('');
   const [mediaUrl, setMediaUrl] = useState('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=800');
+  const [mediaType, setMediaType] = useState('image');
 
   useEffect(() => {
     if (isOpen) {
@@ -26,6 +27,9 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|webm)$/i.test(file.name);
+      setMediaType(isVideo ? 'video' : 'image');
+
       const reader = new FileReader();
       reader.onloadend = () => {
         if (reader.result) {
@@ -45,7 +49,7 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
       authorUsername: currentUser.username || currentUser.name.toLowerCase().replace(/\s+/g, ''),
       avatar: currentUser.avatar || currentUser.logo,
       mediaUrl,
-      mediaType: 'image',
+      mediaType,
       caption,
     });
 
@@ -79,8 +83,12 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
           {/* MEDIA PREVIEW & FILE UPLOAD */}
           <div className="p-3 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 text-center space-y-2">
             {mediaUrl && (
-              <div className="relative max-h-40 overflow-hidden rounded-xl bg-black">
-                <img src={mediaUrl} alt="Story preview" className="w-full h-36 object-cover" />
+              <div className="relative max-h-44 overflow-hidden rounded-xl bg-black">
+                {mediaType === 'video' ? (
+                  <video src={mediaUrl} controls autoPlay className="w-full h-36 object-cover" />
+                ) : (
+                  <img src={mediaUrl} alt="Story preview" className="w-full h-36 object-cover" />
+                )}
               </div>
             )}
 
@@ -90,7 +98,7 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
                 className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs shadow cursor-pointer hover:bg-[#5847E0] transition-colors inline-flex items-center gap-2"
               >
                 <ImageIcon className="w-4 h-4" />
-                <span>📁 Select Photo from Device Gallery</span>
+                <span>📁 Select Photo/Video from Device</span>
               </label>
               <input 
                 id="story-file-input"
