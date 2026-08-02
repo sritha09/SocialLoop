@@ -1,19 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { X } from 'lucide-react';
 
 export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
+  const scrollYRef = useRef(0);
+
   useEffect(() => {
     if (isOpen) {
-      const prevBodyOverflow = document.body.style.overflow;
-      const prevHtmlOverflow = document.documentElement.style.overflow;
+      // 1. Record exact window scroll position before locking
+      scrollYRef.current = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      
+      // 2. Capture original body inline styles
+      const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
 
+      // 3. Compute scrollbar width to prevent horizontal layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+      // 4. Lock scroll exclusively on body element (leave documentElement untouched)
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
 
       return () => {
-        document.body.style.overflow = prevBodyOverflow || '';
-        document.documentElement.style.overflow = prevHtmlOverflow || '';
+        // 5. Restore original body inline styles
+        document.body.style.overflow = originalOverflow || '';
+        document.body.style.paddingRight = originalPaddingRight || '';
+
+        // 6. Instantly restore exact window scroll position
+        window.scrollTo({
+          top: scrollYRef.current,
+          left: 0,
+          behavior: 'instant'
+        });
       };
     }
   }, [isOpen]);
