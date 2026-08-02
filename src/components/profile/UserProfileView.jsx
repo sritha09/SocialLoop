@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { 
-  ShieldCheck, Star, MapPin, Globe, Users, Award, MessageSquare, UserPlus, Grid, Handshake, Edit3
+  ShieldCheck, Star, MapPin, Globe, Users, Award, MessageSquare, UserPlus, Grid, Handshake, Edit3, PlusCircle
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, TwitterIcon, LinkedinIcon } from '../common/Icons';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { EditProfileModal } from './EditProfileModal';
+import { PostDetailModal } from '../feed/PostDetailModal';
+import { CreatePostModal } from '../feed/CreatePostModal';
 
 export const UserProfileView = ({ userId, onChatClick }) => {
   const { currentUser, users } = useAuth();
@@ -13,6 +15,8 @@ export const UserProfileView = ({ userId, onChatClick }) => {
 
   const [activeTab, setActiveTab] = useState('posts'); // 'posts', 'collabs', 'reviews'
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
 
   const profileUser = users.find(u => u.id === userId) || currentUser;
   const isBusiness = profileUser?.role === 'business';
@@ -85,13 +89,23 @@ export const UserProfileView = ({ userId, onChatClick }) => {
             {/* ACTION BUTTONS */}
             <div className="flex items-center justify-center gap-3">
               {currentUser?.id === profileUser.id ? (
-                <button
-                  onClick={() => setIsEditProfileOpen(true)}
-                  className="px-5 py-2.5 rounded-xl gradient-button text-white font-bold text-xs shadow flex items-center gap-1.5"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  <span>Edit Profile</span>
-                </button>
+                <>
+                  <button
+                    onClick={() => setIsCreatePostOpen(true)}
+                    className="px-4 py-2.5 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs shadow flex items-center gap-1.5 hover:bg-[#5847E0] transition-colors"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Create Post</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsEditProfileOpen(true)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"
+                  >
+                    <Edit3 className="w-4 h-4 text-[#6D5EF8]" />
+                    <span>Edit Profile</span>
+                  </button>
+                </>
               ) : (
                 <>
                   <button
@@ -193,21 +207,45 @@ export const UserProfileView = ({ userId, onChatClick }) => {
           </button>
         </div>
 
-        {/* POSTS GRID */}
+        {/* POSTS GRID (CLICK OPENS POST DETAIL MODAL) */}
         {activeTab === 'posts' && (
           <div>
             {userPosts.length === 0 ? (
-              <div className="p-8 text-center glass-panel rounded-2xl text-xs text-slate-500">
-                No social posts created yet.
+              <div className="p-12 text-center glass-panel rounded-2xl space-y-3">
+                <p className="text-xs text-slate-500">No social posts created yet.</p>
+                {currentUser?.id === profileUser.id && (
+                  <button
+                    onClick={() => setIsCreatePostOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs inline-flex items-center gap-1.5"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Create Your First Post</span>
+                  </button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {userPosts.map(post => (
-                  <div key={post.id} className="glass-card rounded-xl overflow-hidden border border-[#ECECF3] dark:border-[#26334D] space-y-2 p-3">
+                  <div 
+                    key={post.id} 
+                    onClick={() => setSelectedPostForDetail(post)}
+                    className="glass-card rounded-xl overflow-hidden border border-[#ECECF3] dark:border-[#26334D] space-y-2 p-3 cursor-pointer hover:border-[#6D5EF8] transition-all group"
+                  >
                     {post.images?.[0] && (
-                      <img src={post.images[0]} alt="Post" className="w-full h-44 object-cover rounded-lg" />
+                      <div className="relative max-h-44 overflow-hidden rounded-lg bg-black">
+                        {post.mediaTypes?.[0] === 'video' || post.images[0]?.match(/\.(mp4|mov|webm)$/i) ? (
+                          <video src={post.images[0]} className="w-full h-44 object-cover" />
+                        ) : (
+                          <img src={post.images[0]} alt="Post" className="w-full h-44 object-cover group-hover:scale-105 transition-transform" />
+                        )}
+                        {post.images.length > 1 && (
+                          <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white font-bold text-[10px]">
+                            +{post.images.length - 1}
+                          </span>
+                        )}
+                      </div>
                     )}
-                    <p className="text-xs text-slate-800 dark:text-slate-200 line-clamp-2">{post.caption}</p>
+                    <p className="text-xs text-slate-800 dark:text-slate-200 line-clamp-2 font-medium">{post.caption}</p>
                   </div>
                 ))}
               </div>
@@ -262,10 +300,21 @@ export const UserProfileView = ({ userId, onChatClick }) => {
 
       </div>
 
-      {/* EDIT PROFILE MODAL */}
+      {/* MODALS */}
       <EditProfileModal 
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
+      />
+
+      <CreatePostModal 
+        isOpen={isCreatePostOpen}
+        onClose={() => setIsCreatePostOpen(false)}
+      />
+
+      <PostDetailModal
+        post={selectedPostForDetail}
+        isOpen={!!selectedPostForDetail}
+        onClose={() => setSelectedPostForDetail(null)}
       />
 
     </div>

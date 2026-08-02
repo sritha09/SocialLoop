@@ -25,6 +25,8 @@ import { AdminPanel } from './components/dashboard/AdminPanel';
 
 import { AuthModal } from './components/auth/AuthModal';
 import { CreateCampaignModal } from './components/campaign/CreateCampaignModal';
+import { CreatePostModal } from './components/feed/CreatePostModal';
+import { CreateStoryModal } from './components/feed/CreateStoryModal';
 import { CampaignDetailModal } from './components/campaign/CampaignDetailModal';
 import { ApplyModal } from './components/campaign/ApplyModal';
 import { CampaignManagement } from './components/campaign/CampaignManagement';
@@ -52,6 +54,9 @@ const MainAppContent = () => {
   const [authInitialMode, setAuthInitialMode] = useState('login');
   
   const [isCreateCampOpen, setIsCreateCampOpen] = useState(false);
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [isCreateStoryOpen, setIsCreateStoryOpen] = useState(false);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState(null);
   
@@ -87,7 +92,7 @@ const MainAppContent = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-[#6D5EF8] selection:text-white">
+    <div className="min-h-screen flex flex-col selection:bg-[#6D5EF8] selection:text-[#6D5EF8]">
       
       {/* STICKY NAVBAR */}
       <Navbar 
@@ -226,6 +231,8 @@ const MainAppContent = () => {
           activeView={activeView}
           setActiveView={setActiveView}
           openCreateCampaignModal={() => setIsCreateCampOpen(true)}
+          openCreatePostModal={() => setIsCreatePostOpen(true)}
+          openCreateStoryModal={() => setIsCreateStoryOpen(true)}
         />
       )}
 
@@ -242,6 +249,16 @@ const MainAppContent = () => {
       <CreateCampaignModal 
         isOpen={isCreateCampOpen}
         onClose={() => setIsCreateCampOpen(false)}
+      />
+
+      <CreatePostModal 
+        isOpen={isCreatePostOpen}
+        onClose={() => setIsCreatePostOpen(false)}
+      />
+
+      <CreateStoryModal 
+        isOpen={isCreateStoryOpen}
+        onClose={() => setIsCreateStoryOpen(false)}
       />
 
       <SettingsModal 
