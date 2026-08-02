@@ -107,7 +107,7 @@ const MainAppContent = () => {
         
         {/* LOGGED-OUT USERS: PUBLIC LANDING PAGE */}
         {!currentUser && activeView === 'landing' && (
-          <div className="space-y-12 animate-fadeIn">
+          <div className="space-y-12">
             <HeroSection setActiveView={setActiveView} openAuthModal={openAuthModal} />
             <StatsSection />
             <FeaturesSection />

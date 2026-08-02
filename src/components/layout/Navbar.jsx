@@ -61,22 +61,10 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
                 Home
               </button>
               <button
-                onClick={() => navigateSection('features')}
-                className="px-4 py-1.5 text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8] rounded-full transition-all"
-              >
-                Features
-              </button>
-              <button
                 onClick={() => navigateSection('how-it-works')}
                 className="px-4 py-1.5 text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8] rounded-full transition-all"
               >
                 How It Works
-              </button>
-              <button
-                onClick={() => openLegalModal('about')}
-                className="px-4 py-1.5 text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8] rounded-full transition-all"
-              >
-                About
               </button>
             </nav>
           )}
