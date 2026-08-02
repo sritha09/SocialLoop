@@ -381,3 +381,101 @@ export const LEADERBOARD_BUSINESSES = [
   { rank: 2, name: 'Artisan Roast Cafe', rating: 4.90, campaigns: 8, totalPaid: '$14,500', logo: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=300', category: 'Cafe & Dining' },
   { rank: 3, name: 'PulseFit Wear', rating: 4.80, campaigns: 15, totalPaid: '$36,000', logo: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=300', category: 'Fashion & Fitness' }
 ];
+
+export const INITIAL_STORIES = [
+  {
+    id: 's1',
+    authorId: 'i1',
+    authorName: 'Maya Lin',
+    authorUsername: '@mayacreates',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
+    mediaUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=800',
+    mediaType: 'image',
+    caption: 'Behind the scenes at Artisan Roast cold brew tasting! ☕✨',
+    createdAt: new Date().toISOString(),
+    viewsCount: 342,
+    hasUnseen: true
+  },
+  {
+    id: 's2',
+    authorId: 'b1',
+    authorName: 'Artisan Roast Cafe',
+    authorUsername: '@artisanroast_sf',
+    avatar: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=300',
+    mediaUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800',
+    mediaType: 'image',
+    caption: 'Fresh organic pour-over batch ready for the morning rush! 🥐',
+    createdAt: new Date().toISOString(),
+    viewsCount: 512,
+    hasUnseen: true
+  },
+  {
+    id: 's3',
+    authorId: 'i2',
+    authorName: 'Devon Carter',
+    authorUsername: '@devonfit',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300',
+    mediaUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=800',
+    mediaType: 'image',
+    caption: 'Morning 6 AM calisthenics grind in Central Park 🔥💪',
+    createdAt: new Date().toISOString(),
+    viewsCount: 890,
+    hasUnseen: true
+  }
+];
+
+export const INITIAL_POSTS = [
+  {
+    id: 'p1',
+    authorId: 'i1',
+    authorName: 'Maya Lin',
+    authorUsername: '@mayacreates',
+    authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300',
+    authorRole: 'influencer',
+    isVerified: true,
+    location: 'San Francisco, CA',
+    images: [
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=800'
+    ],
+    caption: 'Tasted the new Botanical Cold Brew series at @artisanroast_sf! 🌿☕ The blueberry notes are out of this world. Escrow payout received via SocialLoop! #SFEats #CoffeeLover #SocialLoopCollab',
+    hashtags: ['SFEats', 'CoffeeLover', 'SocialLoopCollab', 'CreatorsOfSF'],
+    likesCount: 1420,
+    likedBy: ['b1', 'i2'],
+    commentsCount: 38,
+    comments: [
+      { id: 'c1', authorName: 'Artisan Roast Cafe', text: 'Thanks Maya! Wonderful having you at the flagship store! ❤️', timestamp: '2h ago' },
+      { id: 'c2', authorName: 'Devon Carter', text: 'Need to grab one next time I am in SF!', timestamp: '1h ago' }
+    ],
+    sharesCount: 84,
+    savesCount: 112,
+    viewCount: 12400,
+    createdAt: '2026-08-01T14:20:00Z'
+  },
+  {
+    id: 'p2',
+    authorId: 'b2',
+    authorName: 'PulseFit Wear',
+    authorUsername: '@pulsefitwear',
+    authorAvatar: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=300',
+    authorRole: 'business',
+    isVerified: true,
+    location: 'New York, NY',
+    images: [
+      'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=800'
+    ],
+    caption: 'Official launch of our Eco-Athleisure Pro Series! ♻️ Engineered with recycled ocean plastics and ultra-breathable weave. Seeking 3 NYC creators for long-term monthly collabs.',
+    hashtags: ['EcoAthleisure', 'Activewear', 'NYCFitness', 'BrandCollab'],
+    likesCount: 2150,
+    likedBy: ['i2', 'i3'],
+    commentsCount: 64,
+    comments: [
+      { id: 'c3', authorName: 'Devon Carter', text: 'Submitted my proposal on SocialLoop! Let’s do this! 💪', timestamp: '4h ago' }
+    ],
+    sharesCount: 195,
+    savesCount: 310,
+    viewCount: 28900,
+    createdAt: '2026-07-31T09:15:00Z'
+  }
+];
+

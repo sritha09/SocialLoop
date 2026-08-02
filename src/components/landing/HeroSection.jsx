@@ -1,12 +1,9 @@
 import React from 'react';
-import { ArrowRight, ShieldCheck, Star, Users, CheckCircle2, Sparkles, TrendingUp, DollarSign } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { ArrowRight, ShieldCheck, Users, CheckCircle2, Sparkles } from 'lucide-react';
 
 export const HeroSection = ({ setActiveView, openAuthModal }) => {
-  const { switchDemoUser } = useAuth();
-
   return (
-    <section className="relative pt-10 pb-16 lg:pt-16 lg:pb-24 overflow-hidden">
+    <section className="relative pt-8 pb-14 lg:pt-14 lg:pb-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* HERO MAIN GRID */}
@@ -31,7 +28,7 @@ export const HeroSection = ({ setActiveView, openAuthModal }) => {
             {/* TWO MAIN CTA BUTTONS */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
               <button
-                onClick={() => setActiveView('explore')}
+                onClick={() => openAuthModal('signup', 'business')}
                 className="w-full sm:w-auto px-7 py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 group"
               >
                 <span>Find Creators</span>
@@ -61,67 +58,27 @@ export const HeroSection = ({ setActiveView, openAuthModal }) => {
 
           </div>
 
-          {/* HERO RIGHT COLUMN: STARTUP DASHBOARD PREVIEW MOCKUP */}
+          {/* HERO RIGHT COLUMN: RESTORED HERO ILLUSTRATION */}
           <div className="lg:col-span-6 relative">
             <div className="relative mx-auto max-w-lg lg:max-w-none">
               
-              {/* MAIN DASHBOARD PREVIEW SURFACE */}
-              <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-4 animate-float">
-                
-                {/* PREVIEW TOP BAR */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-slate-800">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-[#6D5EF8] font-bold text-xs">
-                      SL
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-slate-900 dark:text-white">Artisan Roast SF x Maya Lin</h4>
-                      <p className="text-[11px] text-slate-500">Instagram Reel Campaign • SF Local</p>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
-                    Escrow Locked ($450)
-                  </span>
+              <div className="glass-panel p-3 rounded-3xl border border-[#ECECF3] dark:border-[#26334D] shadow-xl overflow-hidden animate-float">
+                <img 
+                  src="/hero_illustration.png" 
+                  alt="SocialLoop Creator and Business Collaboration Illustration" 
+                  className="w-full h-auto rounded-2xl object-cover shadow-inner"
+                />
+              </div>
+
+              {/* FLOATING ESCROW BADGE */}
+              <div className="absolute -bottom-6 -left-6 glass-card p-4 rounded-2xl z-20 shadow-xl border border-[#ECECF3] dark:border-[#26334D] hidden sm:flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-[#6D5EF8] font-bold text-sm">
+                  100%
                 </div>
-
-                {/* STAT CARDS PREVIEW */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase">Reach</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white mt-0.5">85.4K</p>
-                    <span className="text-[9px] text-emerald-500 font-bold flex items-center gap-0.5 mt-1">
-                      <TrendingUp className="w-2.5 h-2.5" /> +14%
-                    </span>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase">Eng. Rate</p>
-                    <p className="text-sm font-black text-[#6D5EF8] mt-0.5">4.8%</p>
-                    <span className="text-[9px] text-slate-500 mt-1">High Intent</span>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase">Payout</p>
-                    <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5">$450</p>
-                    <span className="text-[9px] text-emerald-500 font-bold mt-1">Guaranteed</span>
-                  </div>
+                <div>
+                  <p className="text-[11px] text-slate-400 font-medium">Escrow Protected</p>
+                  <p className="text-xs font-black text-emerald-500">Guaranteed Payment</p>
                 </div>
-
-                {/* MINI IN-CHAT PREVIEW */}
-                <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800 space-y-2 text-xs">
-                  <div className="flex items-start gap-2">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" alt="Maya" className="w-6 h-6 rounded-full object-cover mt-0.5" />
-                    <div className="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-                      I can deliver 1 Instagram Reel + 3 Stories by Friday! ☕
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-end gap-2">
-                    <div className="bg-[#6D5EF8] text-white p-2 rounded-xl text-right">
-                      Deal accepted! Escrow funded.
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
             </div>

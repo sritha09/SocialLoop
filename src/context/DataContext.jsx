@@ -6,55 +6,75 @@ import {
   INITIAL_DEALS,
   INITIAL_MESSAGES,
   INITIAL_NOTIFICATIONS,
-  INITIAL_REVIEWS
+  INITIAL_REVIEWS,
+  INITIAL_POSTS,
+  INITIAL_STORIES
 } from '../mockData/initialData';
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState(() => {
-    const saved = localStorage.getItem('ic_campaigns');
+    const saved = localStorage.getItem('sl_campaigns');
     return saved ? JSON.parse(saved) : INITIAL_CAMPAIGNS;
   });
 
   const [applications, setApplications] = useState(() => {
-    const saved = localStorage.getItem('ic_applications');
+    const saved = localStorage.getItem('sl_applications');
     return saved ? JSON.parse(saved) : INITIAL_APPLICATIONS;
   });
 
   const [deals, setDeals] = useState(() => {
-    const saved = localStorage.getItem('ic_deals');
+    const saved = localStorage.getItem('sl_deals');
     return saved ? JSON.parse(saved) : INITIAL_DEALS;
   });
 
   const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem('ic_messages');
+    const saved = localStorage.getItem('sl_messages');
     return saved ? JSON.parse(saved) : INITIAL_MESSAGES;
   });
 
   const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem('ic_notifications');
+    const saved = localStorage.getItem('sl_notifications');
     return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
   });
 
   const [reviews, setReviews] = useState(() => {
-    const saved = localStorage.getItem('ic_reviews');
+    const saved = localStorage.getItem('sl_reviews');
     return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
   });
 
   const [savedCampaigns, setSavedCampaigns] = useState(() => {
-    const saved = localStorage.getItem('ic_saved_campaigns');
+    const saved = localStorage.getItem('sl_saved_campaigns');
     return saved ? JSON.parse(saved) : ['c1'];
   });
 
+  const [posts, setPosts] = useState(() => {
+    const saved = localStorage.getItem('sl_posts');
+    return saved ? JSON.parse(saved) : INITIAL_POSTS;
+  });
+
+  const [stories, setStories] = useState(() => {
+    const saved = localStorage.getItem('sl_stories');
+    return saved ? JSON.parse(saved) : INITIAL_STORIES;
+  });
+
+  const [followingMap, setFollowingMap] = useState(() => {
+    const saved = localStorage.getItem('sl_following');
+    return saved ? JSON.parse(saved) : { i1: ['b1', 'b2'], b1: ['i1'] };
+  });
+
   // Sync to LocalStorage
-  useEffect(() => { localStorage.setItem('ic_campaigns', JSON.stringify(campaigns)); }, [campaigns]);
-  useEffect(() => { localStorage.setItem('ic_applications', JSON.stringify(applications)); }, [applications]);
-  useEffect(() => { localStorage.setItem('ic_deals', JSON.stringify(deals)); }, [deals]);
-  useEffect(() => { localStorage.setItem('ic_messages', JSON.stringify(messages)); }, [messages]);
-  useEffect(() => { localStorage.setItem('ic_notifications', JSON.stringify(notifications)); }, [notifications]);
-  useEffect(() => { localStorage.setItem('ic_reviews', JSON.stringify(reviews)); }, [reviews]);
-  useEffect(() => { localStorage.setItem('ic_saved_campaigns', JSON.stringify(savedCampaigns)); }, [savedCampaigns]);
+  useEffect(() => { localStorage.setItem('sl_campaigns', JSON.stringify(campaigns)); }, [campaigns]);
+  useEffect(() => { localStorage.setItem('sl_applications', JSON.stringify(applications)); }, [applications]);
+  useEffect(() => { localStorage.setItem('sl_deals', JSON.stringify(deals)); }, [deals]);
+  useEffect(() => { localStorage.setItem('sl_messages', JSON.stringify(messages)); }, [messages]);
+  useEffect(() => { localStorage.setItem('sl_notifications', JSON.stringify(notifications)); }, [notifications]);
+  useEffect(() => { localStorage.setItem('sl_reviews', JSON.stringify(reviews)); }, [reviews]);
+  useEffect(() => { localStorage.setItem('sl_saved_campaigns', JSON.stringify(savedCampaigns)); }, [savedCampaigns]);
+  useEffect(() => { localStorage.setItem('sl_posts', JSON.stringify(posts)); }, [posts]);
+  useEffect(() => { localStorage.setItem('sl_stories', JSON.stringify(stories)); }, [stories]);
+  useEffect(() => { localStorage.setItem('sl_following', JSON.stringify(followingMap)); }, [followingMap]);
 
   // CAMPAIGN ACTIONS
   const createCampaign = (campaignData) => {
@@ -68,7 +88,6 @@ export const DataProvider = ({ children }) => {
     };
     setCampaigns(prev => [newCamp, ...prev]);
 
-    // Send notification
     addNotification({
       userId: campaignData.businessId,
       title: 'Campaign Published!',
@@ -98,10 +117,8 @@ export const DataProvider = ({ children }) => {
     };
     setApplications(prev => [newApp, ...prev]);
 
-    // Increment campaign applicants count
     setCampaigns(prev => prev.map(c => c.id === appData.campaignId ? { ...c, applicantsCount: (c.applicantsCount || 0) + 1 } : c));
 
-    // Notify business owner
     const campaign = campaigns.find(c => c.id === appData.campaignId);
     if (campaign) {
       addNotification({
@@ -122,7 +139,6 @@ export const DataProvider = ({ children }) => {
     const app = applications.find(a => a.id === appId);
     if (app && newStatus === 'Accepted') {
       const campaign = campaigns.find(c => c.id === app.campaignId);
-      // Auto-create deal draft
       if (campaign) {
         createDeal({
           campaignId: campaign.id,
@@ -135,7 +151,7 @@ export const DataProvider = ({ children }) => {
           paymentMethod: 'Online',
           status: 'Active',
           paymentStatus: 'Processing',
-          qrCodeToken: `IC-QR-${campaign.id}-${Date.now().toString().slice(-4)}`
+          qrCodeToken: `SL-QR-${campaign.id}-${Date.now().toString().slice(-4)}`
         });
       }
 
@@ -167,7 +183,6 @@ export const DataProvider = ({ children }) => {
     setDeals(prev => prev.map(d => {
       if (d.id === dealId) {
         const updated = { ...d, ...updates };
-        // Check if offline payment is fully confirmed by both sides
         if (updated.paymentMethod === 'Offline' && updated.offlineBusinessPaid && updated.offlineInfluencerReceived) {
           updated.paymentStatus = 'Completed';
           updated.status = 'Completed';
@@ -176,6 +191,127 @@ export const DataProvider = ({ children }) => {
       }
       return d;
     }));
+  };
+
+  // POST ACTIONS
+  const addPost = (postData) => {
+    const newPost = {
+      id: 'p' + Date.now(),
+      likesCount: 0,
+      likedBy: [],
+      commentsCount: 0,
+      comments: [],
+      sharesCount: 0,
+      savesCount: 0,
+      viewCount: 1,
+      createdAt: new Date().toISOString(),
+      ...postData,
+    };
+    setPosts(prev => [newPost, ...prev]);
+
+    confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } });
+    return newPost;
+  };
+
+  const likePost = (postId, userId) => {
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const hasLiked = p.likedBy?.includes(userId);
+        const updatedLikes = hasLiked
+          ? p.likedBy.filter(id => id !== userId)
+          : [...(p.likedBy || []), userId];
+        
+        if (!hasLiked && p.authorId !== userId) {
+          addNotification({
+            userId: p.authorId,
+            title: 'New Like ❤️',
+            message: `Someone liked your post "${p.caption?.slice(0, 30)}..."`,
+            type: 'like'
+          });
+        }
+
+        return {
+          ...p,
+          likedBy: updatedLikes,
+          likesCount: updatedLikes.length
+        };
+      }
+      return p;
+    }));
+  };
+
+  const commentPost = (postId, commentData) => {
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const newComments = [...(p.comments || []), { id: 'c' + Date.now(), ...commentData }];
+        
+        if (p.authorId !== commentData.authorId) {
+          addNotification({
+            userId: p.authorId,
+            title: 'New Comment 💬',
+            message: `${commentData.authorName}: "${commentData.text?.slice(0, 35)}..."`,
+            type: 'comment'
+          });
+        }
+
+        return {
+          ...p,
+          comments: newComments,
+          commentsCount: newComments.length
+        };
+      }
+      return p;
+    }));
+  };
+
+  // STORY ACTIONS
+  const addStory = (storyData) => {
+    const newStory = {
+      id: 's' + Date.now(),
+      viewsCount: 1,
+      createdAt: new Date().toISOString(),
+      hasUnseen: true,
+      ...storyData
+    };
+    setStories(prev => [newStory, ...prev]);
+
+    confetti({ particleCount: 50, spread: 40 });
+    return newStory;
+  };
+
+  const viewStory = (storyId, viewerId) => {
+    setStories(prev => prev.map(s => {
+      if (s.id === storyId) {
+        return {
+          ...s,
+          viewsCount: (s.viewsCount || 0) + 1,
+          hasUnseen: false
+        };
+      }
+      return s;
+    }));
+  };
+
+  // FOLLOW ACTIONS
+  const followUser = (currentUserId, targetUserId) => {
+    setFollowingMap(prev => {
+      const currentList = prev[currentUserId] || [];
+      const isFollowing = currentList.includes(targetUserId);
+      const updated = isFollowing
+        ? currentList.filter(id => id !== targetUserId)
+        : [...currentList, targetUserId];
+
+      if (!isFollowing) {
+        addNotification({
+          userId: targetUserId,
+          title: 'New Follower! 👤',
+          message: 'Someone started following your profile on SocialLoop.',
+          type: 'follow'
+        });
+      }
+
+      return { ...prev, [currentUserId]: updated };
+    });
   };
 
   // CHAT MESSAGES
@@ -251,7 +387,16 @@ export const DataProvider = ({ children }) => {
       reviews,
       addReview,
       savedCampaigns,
-      toggleSaveCampaign
+      toggleSaveCampaign,
+      posts,
+      addPost,
+      likePost,
+      commentPost,
+      stories,
+      addStory,
+      viewStory,
+      followingMap,
+      followUser
     }}>
       {children}
     </DataContext.Provider>

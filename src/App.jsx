@@ -15,6 +15,7 @@ import { LeaderboardSection } from './components/landing/LeaderboardSection';
 import { TestimonialsSection } from './components/landing/TestimonialsSection';
 import { FAQSection } from './components/landing/FAQSection';
 
+import { HomeFeed } from './components/feed/HomeFeed';
 import { BusinessDashboard } from './components/dashboard/BusinessDashboard';
 import { InfluencerDashboard } from './components/dashboard/InfluencerDashboard';
 import { ExploreCampaignsView } from './components/campaign/ExploreCampaignsView';
@@ -28,6 +29,7 @@ import { CampaignDetailModal } from './components/campaign/CampaignDetailModal';
 import { ApplyModal } from './components/campaign/ApplyModal';
 import { CampaignManagement } from './components/campaign/CampaignManagement';
 import { SettingsModal } from './components/common/SettingsModal';
+import { LegalModals } from './components/common/LegalModals';
 
 import { ChatWindow } from './components/chat/ChatWindow';
 import { UserProfileView } from './components/profile/UserProfileView';
@@ -39,8 +41,8 @@ import { AIChatbot } from './components/ai/AIChatbot';
 const MainAppContent = () => {
   const { currentUser, isBusiness, logout } = useAuth();
   
-  // Default view: if user logged in, go straight to dashboard. Otherwise public landing page.
-  const [activeView, setActiveView] = useState(() => currentUser ? 'dashboard' : 'landing');
+  // Default view: if user logged in, go to feed. Otherwise public landing page.
+  const [activeView, setActiveView] = useState(() => currentUser ? 'feed' : 'landing');
   const [chatTargetUserId, setChatTargetUserId] = useState(null);
 
   // MODAL STATES
@@ -49,6 +51,7 @@ const MainAppContent = () => {
   
   const [isCreateCampOpen, setIsCreateCampOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState(null);
   
   const [selectedDetailCamp, setSelectedDetailCamp] = useState(null);
   const [selectedApplyCamp, setSelectedApplyCamp] = useState(null);
@@ -57,12 +60,11 @@ const MainAppContent = () => {
   const [selectedInvoiceDeal, setSelectedInvoiceDeal] = useState(null);
   const [selectedQRDeal, setSelectedQRDeal] = useState(null);
 
-  const openAuthModal = (mode = 'login') => {
+  const openAuthModal = (mode = 'login', role = 'business') => {
     setAuthInitialMode(mode);
     setIsAuthOpen(true);
   };
 
-  // DIRECT CHAT HANDLER: Closes open modals & navigates immediately to 'chat' view!
   const handleOpenChat = (targetId) => {
     setSelectedDetailCamp(null);
     setSelectedApplyCamp(null);
@@ -74,16 +76,16 @@ const MainAppContent = () => {
 
   const handleAuthSuccess = () => {
     setIsAuthOpen(false);
-    setActiveView('dashboard');
+    setActiveView('feed');
   };
 
   const handleLogout = () => {
     logout();
-    setActiveView('landing'); // Redirect directly to public landing page on logout!
+    setActiveView('landing');
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+    <div className="min-h-screen flex flex-col selection:bg-[#6D5EF8] selection:text-white">
       
       {/* STICKY NAVBAR */}
       <Navbar 
@@ -93,10 +95,11 @@ const MainAppContent = () => {
         openCreateCampaignModal={() => setIsCreateCampOpen(true)}
         openSettingsModal={() => setIsSettingsOpen(true)}
         onLogoutClick={handleLogout}
+        openLegalModal={(type) => setLegalModalType(type)}
       />
 
       {/* DYNAMIC VIEW ROUTER */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* LOGGED-OUT USERS: PUBLIC LANDING PAGE */}
         {!currentUser && activeView === 'landing' && (
@@ -111,8 +114,20 @@ const MainAppContent = () => {
           </div>
         )}
 
+        {/* LOGGED-IN USERS: SOCIAL HOME FEED */}
+        {currentUser && activeView === 'feed' && (
+          <div className="animate-fadeIn">
+            <HomeFeed 
+              setActiveView={setActiveView}
+              openApplyModal={(camp) => setSelectedApplyCamp(camp)}
+              onViewDetailClick={(camp) => setSelectedDetailCamp(camp)}
+              onChatClick={handleOpenChat}
+            />
+          </div>
+        )}
+
         {/* LOGGED-IN USERS: PERSONAL DASHBOARD WORKSPACE */}
-        {currentUser && (activeView === 'dashboard' || activeView === 'landing') && (
+        {currentUser && activeView === 'dashboard' && (
           <div className="animate-fadeIn">
             {isBusiness ? (
               <BusinessDashboard 
@@ -144,14 +159,14 @@ const MainAppContent = () => {
           </div>
         )}
 
-        {/* DEDICATED MESSAGES & CHATS */}
+        {/* MESSAGES & CHATS */}
         {activeView === 'chat' && (
           <div className="animate-fadeIn">
             <ChatWindow targetUserId={chatTargetUserId} />
           </div>
         )}
 
-        {/* DEDICATED TRANSACTIONS & PAYMENTS */}
+        {/* TRANSACTIONS & PAYMENTS */}
         {activeView === 'transactions' && (
           <div className="animate-fadeIn">
             <TransactionsView 
@@ -201,7 +216,7 @@ const MainAppContent = () => {
       </main>
 
       {/* FOOTER */}
-      <Footer setActiveView={setActiveView} />
+      <Footer setActiveView={setActiveView} openLegalModal={(type) => setLegalModalType(type)} />
 
       {/* FLOATING AI COPILOT BOT */}
       <AIChatbot />
@@ -221,6 +236,11 @@ const MainAppContent = () => {
       <SettingsModal 
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <LegalModals 
+        activeModal={legalModalType}
+        onClose={() => setLegalModalType(null)}
       />
 
       <CampaignDetailModal 

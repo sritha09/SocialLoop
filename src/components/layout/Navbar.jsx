@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Sun, Moon, Bell, User, LogOut, ChevronDown, 
   Menu, X, LayoutDashboard, Compass, MessageSquare, 
-  DollarSign, Handshake, Settings as SettingsIcon, Shield
+  DollarSign, Handshake, Settings as SettingsIcon, Home, Radio
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -10,7 +10,7 @@ import { useData } from '../../context/DataContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { SocialLoopLogo } from '../common/SocialLoopLogo';
 
-export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCampaignModal, openSettingsModal, onLogoutClick }) => {
+export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsModal, onLogoutClick, openLegalModal }) => {
   const { currentUser, isBusiness, switchDemoUser } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { currentCurrency } = useCurrency();
@@ -31,7 +31,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
   const handleRoleSwitch = (userId) => {
     switchDemoUser(userId);
-    setActiveView('dashboard');
+    setActiveView('feed');
   };
 
   const scrollToSection = (sectionId) => {
@@ -51,7 +51,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
         <div className="flex items-center justify-between h-16">
           
           {/* BRAND LOGO */}
-          <div onClick={() => handleNavClick(currentUser ? 'dashboard' : 'landing')}>
+          <div onClick={() => handleNavClick(currentUser ? 'feed' : 'landing')}>
             <SocialLoopLogo />
           </div>
 
@@ -79,20 +79,30 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
                 How It Works
               </button>
               <button
-                onClick={() => scrollToSection('contact')}
+                onClick={() => openLegalModal('about')}
                 className="px-4 py-1.5 text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8] rounded-full transition-all"
               >
-                Contact
+                About
               </button>
             </nav>
           )}
 
-          {/* DASHBOARD NAVIGATION BAR (WHEN LOGGED IN) */}
+          {/* DASHBOARD & SOCIAL NAVIGATION BAR (WHEN LOGGED IN) */}
           {currentUser && (
             <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-900/80 p-1 rounded-full border border-slate-200/80 dark:border-slate-800/80 text-xs font-semibold">
               <button
+                onClick={() => handleNavClick('feed')}
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                  activeView === 'feed' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
+                }`}
+              >
+                <Radio className="w-3.5 h-3.5" />
+                <span>Home Feed</span>
+              </button>
+
+              <button
                 onClick={() => handleNavClick('dashboard')}
-                className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                   activeView === 'dashboard' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
                 }`}
               >
@@ -102,7 +112,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
               <button
                 onClick={() => handleNavClick('explore')}
-                className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                   activeView === 'explore' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
                 }`}
               >
@@ -112,7 +122,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
               <button
                 onClick={() => handleNavClick('chat')}
-                className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                   activeView === 'chat' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
                 }`}
               >
@@ -122,7 +132,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
               <button
                 onClick={() => handleNavClick('campaign-manage')}
-                className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                   activeView === 'campaign-manage' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
                 }`}
               >
@@ -132,7 +142,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
               <button
                 onClick={() => handleNavClick('transactions')}
-                className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                   activeView === 'transactions' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
                 }`}
               >
@@ -142,7 +152,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
               <button
                 onClick={() => handleNavClick('profile')}
-                className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
+                className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all ${
                   activeView === 'profile' ? 'bg-[#6D5EF8] text-white shadow-sm font-bold' : 'text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8]'
                 }`}
               >
@@ -159,7 +169,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
             <button
               onClick={openSettingsModal}
               className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 text-xs font-semibold hover:border-[#6D5EF8] transition-all"
-              title="Currency Localization Settings"
+              title="Currency Settings"
             >
               <span>{currentCurrency.flag}</span>
               <span>{currentCurrency.code}</span>
@@ -167,7 +177,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
             {/* DEMO ROLE SWITCHER */}
             <div className="hidden lg:flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-800">
-              <span className="px-2 text-slate-400">Demo:</span>
+              <span className="px-2 text-slate-400">Role:</span>
               <button 
                 onClick={() => handleRoleSwitch('b1')} 
                 className={`px-2.5 py-1 rounded-lg transition-all ${currentUser?.id === 'b1' ? 'bg-[#6D5EF8] text-white font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'}`}
@@ -265,10 +275,18 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
 
                       <div className="space-y-1 text-xs">
                         <button
+                          onClick={() => { setActiveView('feed'); setIsUserMenuOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-[#6D5EF8] hover:text-white transition-all"
+                        >
+                          <Radio className="w-4 h-4" />
+                          Home Social Feed
+                        </button>
+
+                        <button
                           onClick={() => { setActiveView('dashboard'); setIsUserMenuOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-3 py-2 font-medium rounded-xl text-slate-700 dark:text-slate-200 hover:bg-[#6D5EF8] hover:text-white transition-all"
                         >
-                          <User className="w-4 h-4" />
+                          <LayoutDashboard className="w-4 h-4" />
                           Personal Dashboard
                         </button>
 
@@ -332,11 +350,12 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openCreateCam
               <button onClick={() => handleNavClick('landing')} className="block w-full text-left py-2 font-bold text-[#6D5EF8]">Home</button>
               <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2">Features</button>
               <button onClick={() => scrollToSection('how-it-works')} className="block w-full text-left py-2">How It Works</button>
-              <button onClick={() => scrollToSection('contact')} className="block w-full text-left py-2">Contact</button>
+              <button onClick={() => openLegalModal('about')} className="block w-full text-left py-2">About</button>
             </>
           ) : (
             <>
-              <button onClick={() => handleNavClick('dashboard')} className="block w-full text-left py-2 font-bold text-[#6D5EF8]">Dashboard</button>
+              <button onClick={() => handleNavClick('feed')} className="block w-full text-left py-2 font-bold text-[#6D5EF8]">Home Feed</button>
+              <button onClick={() => handleNavClick('dashboard')} className="block w-full text-left py-2 font-bold">Dashboard</button>
               <button onClick={() => handleNavClick('explore')} className="block w-full text-left py-2">Explore</button>
               <button onClick={() => handleNavClick('chat')} className="block w-full text-left py-2">Messages</button>
               <button onClick={() => handleNavClick('campaign-manage')} className="block w-full text-left py-2">Deals</button>

@@ -10,6 +10,8 @@ export const CURRENCIES = {
   JPY: { code: 'JPY', symbol: '¥', rate: 152.0, label: 'Japanese Yen (¥ JPY)', flag: '🇯🇵' },
   AUD: { code: 'AUD', symbol: 'A$', rate: 1.52, label: 'Australian Dollar (A$ AUD)', flag: '🇦🇺' },
   CAD: { code: 'CAD', symbol: 'C$', rate: 1.36, label: 'Canadian Dollar (C$ CAD)', flag: '🇨🇦' },
+  SGD: { code: 'SGD', symbol: 'S$', rate: 1.34, label: 'Singapore Dollar (S$ SGD)', flag: '🇸🇬' },
+  AED: { code: 'AED', symbol: 'AED', rate: 3.67, label: 'UAE Dirham (AED)', flag: '🇦🇪' },
 };
 
 export const CurrencyProvider = ({ children }) => {
@@ -26,8 +28,10 @@ export const CurrencyProvider = ({ children }) => {
       if (tz.includes('Tokyo')) return 'JPY';
       if (tz.includes('Sydney') || tz.includes('Melbourne') || tz.includes('Brisbane')) return 'AUD';
       if (tz.includes('Toronto') || tz.includes('Vancouver')) return 'CAD';
+      if (tz.includes('Singapore')) return 'SGD';
+      if (tz.includes('Dubai') || tz.includes('Muscat')) return 'AED';
     } catch (e) {
-      // Fallback to USD
+      // Fallback
     }
     return 'USD';
   });
@@ -39,7 +43,7 @@ export const CurrencyProvider = ({ children }) => {
   const currentCurrency = CURRENCIES[currencyCode] || CURRENCIES.USD;
 
   const formatCurrency = (amountInUSD) => {
-    if (amountInUSD === undefined || amountInUSD === null) return `${currentCurrency.symbol}0`;
+    if (amountInUSD === undefined || amountInUSD === null || isNaN(amountInUSD)) return `${currentCurrency.symbol}0`;
     const converted = Math.round(Number(amountInUSD) * currentCurrency.rate);
     return `${currentCurrency.symbol}${converted.toLocaleString()}`;
   };

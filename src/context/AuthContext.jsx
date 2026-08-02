@@ -72,6 +72,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    localStorage.removeItem('ic_current_user');
+    localStorage.removeItem('sl_current_user');
     setCurrentUser(null);
   };
 
