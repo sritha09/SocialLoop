@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Automatically filter out any stale demo users
         return parsed.filter(u => u && !['b1', 'b2', 'b3', 'i1', 'i2', 'i3', 'b4', 'i4'].includes(u.id));
       } catch (e) {
         return [];
@@ -46,16 +45,74 @@ export const AuthProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  const login = (email, password) => {
-    const user = users.find(u => u.email?.toLowerCase() === email?.toLowerCase());
-    if (user) {
-      setCurrentUser(user);
-      return { success: true, user };
+  // Clean username helper
+  const cleanUsername = (username) => {
+    if (!username) return '';
+    return username.trim().toLowerCase().replace(/^@/, '');
+  };
+
+  // Check username availability in real-time
+  const checkUsernameAvailability = (username) => {
+    const target = cleanUsername(username);
+    if (!target) return true;
+    return !users.some(u => cleanUsername(u.username) === target);
+  };
+
+  const login = (identifier, password) => {
+    if (!identifier) {
+      return { success: false, message: 'Please enter your username or email address.' };
     }
+
+    const cleanInput = identifier.trim().toLowerCase();
+    const cleanHandle = cleanInput.replace(/^@/, '');
+
+    // 1. Check if identifier is a specific unique username
+    const usernameMatch = users.find(u => cleanUsername(u.username) === cleanHandle);
+    if (usernameMatch) {
+      setCurrentUser(usernameMatch);
+      return { success: true, user: usernameMatch };
+    }
+
+    // 2. Check if identifier is an email address
+    const matchingAccounts = users.filter(u => u.email?.toLowerCase() === cleanInput);
+
+    if (matchingAccounts.length > 1) {
+      return { 
+        requiresAccountSelection: true, 
+        accounts: matchingAccounts,
+        message: 'Multiple SocialLoop accounts found for this email address.' 
+      };
+    }
+
+    if (matchingAccounts.length === 1) {
+      setCurrentUser(matchingAccounts[0]);
+      return { success: true, user: matchingAccounts[0] };
+    }
+
     return { success: false, message: 'Account not found. Please sign up to create your account!' };
   };
 
+  const selectAccount = (account) => {
+    if (!account) return;
+    setCurrentUser(account);
+    return { success: true, user: account };
+  };
+
   const signup = (userData) => {
+    const formattedUsername = userData.username 
+      ? (userData.username.startsWith('@') ? userData.username : `@${userData.username.trim()}`)
+      : `@user_${Date.now().toString().slice(-4)}`;
+
+    const targetHandle = cleanUsername(formattedUsername);
+
+    // Verify username availability globally
+    if (users.some(u => cleanUsername(u.username) === targetHandle)) {
+      return { 
+        success: false, 
+        message: 'This username is already taken. Please choose another one.' 
+      };
+    }
+
     const id = (userData.role === 'business' ? 'b' : 'i') + Date.now();
     const newUser = {
       id,
@@ -73,6 +130,7 @@ export const AuthProvider = ({ children }) => {
       reviewsCount: 0,
       completionScore: 100,
       isVerified: false,
+      username: formattedUsername,
       avatar: userData.avatar || (userData.role === 'business'
         ? 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=300'
         : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300'),
@@ -80,9 +138,10 @@ export const AuthProvider = ({ children }) => {
       coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1200',
       ...userData,
     };
+
     setUsers(prev => [newUser, ...prev]);
     setCurrentUser(newUser);
-    return newUser;
+    return { success: true, user: newUser };
   };
 
   const updateUserProfile = (updatedData) => {
@@ -102,8 +161,10 @@ export const AuthProvider = ({ children }) => {
       currentUser,
       users,
       login,
+      selectAccount,
       signup,
       logout,
+      checkUsernameAvailability,
       updateUserProfile,
       isBusiness: currentUser?.role === 'business',
       isInfluencer: currentUser?.role === 'influencer',

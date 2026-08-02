@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Briefcase, Building, Mail, Phone, Lock, MapPin, Globe, ArrowRight } from 'lucide-react';
+import { Briefcase, Building, Mail, Phone, Lock, MapPin, Globe, ArrowRight, Camera, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { InstagramIcon } from '../common/Icons';
 import { useAuth } from '../../context/AuthContext';
 
 export const BusinessSignupForm = ({ onSuccess, onClose }) => {
-  const { signup } = useAuth();
+  const { signup, checkUsernameAvailability } = useAuth();
   
   const [formData, setFormData] = useState({
     role: 'business',
     name: '',
+    username: '',
     ownerName: '',
     email: '',
     phone: '',
@@ -23,17 +24,61 @@ export const BusinessSignupForm = ({ onSuccess, onClose }) => {
     logo: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=300'
   });
 
+  const [usernameError, setUsernameError] = useState('');
+  const [formError, setFormError] = useState('');
+
+  const handleUsernameChange = (e) => {
+    const val = e.target.value;
+    setFormData(prev => ({ ...prev, username: val }));
+
+    if (val.trim()) {
+      const isAvailable = checkUsernameAvailability(val);
+      if (!isAvailable) {
+        setUsernameError('This username is already taken. Please choose another one.');
+      } else {
+        setUsernameError('');
+      }
+    } else {
+      setUsernameError('');
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.instagram.trim()) return;
+    setFormError('');
 
-    signup(formData);
-    if (onSuccess) onSuccess();
-    if (onClose) onClose();
+    if (!formData.username.trim()) {
+      setUsernameError('Username is required.');
+      return;
+    }
+
+    if (!checkUsernameAvailability(formData.username)) {
+      setUsernameError('This username is already taken. Please choose another one.');
+      return;
+    }
+
+    if (!formData.instagram.trim()) {
+      setFormError('Instagram Business handle is required.');
+      return;
+    }
+
+    const res = signup(formData);
+    if (res.success) {
+      if (onSuccess) onSuccess();
+      if (onClose) onClose();
+    } else {
+      setFormError(res.message || 'Registration failed.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+      {formError && (
+        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold text-center">
+          {formError}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         
         <div>
@@ -49,6 +94,37 @@ export const BusinessSignupForm = ({ onSuccess, onClose }) => {
               className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Username / Handle *</label>
+          <div className="relative">
+            <Camera className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            <input 
+              type="text" 
+              required
+              placeholder="@beanandleaf" 
+              value={formData.username}
+              onChange={handleUsernameChange}
+              className={`w-full pl-9 pr-3 py-2.5 rounded-xl border bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none font-bold ${
+                usernameError 
+                  ? 'border-rose-500 focus:ring-2 focus:ring-rose-500' 
+                  : 'border-slate-300 dark:border-white/10 focus:ring-2 focus:ring-[#6D5EF8]'
+              }`}
+            />
+          </div>
+          {usernameError && (
+            <p className="text-[11px] text-rose-500 font-semibold mt-1 flex items-center gap-1">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>{usernameError}</span>
+            </p>
+          )}
+          {!usernameError && formData.username.trim() && (
+            <p className="text-[11px] text-emerald-500 font-semibold mt-1 flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span>Username is available!</span>
+            </p>
+          )}
         </div>
 
         <div>
@@ -151,7 +227,6 @@ export const BusinessSignupForm = ({ onSuccess, onClose }) => {
           />
         </div>
 
-        {/* MANDATORY INSTAGRAM HANDLE FIELD */}
         <div className="sm:col-span-2">
           <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
             Instagram Business Handle / Link * <span className="text-rose-500 text-xs font-normal">(Required)</span>
@@ -215,7 +290,8 @@ export const BusinessSignupForm = ({ onSuccess, onClose }) => {
       <div className="pt-4">
         <button
           type="submit"
-          className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow-xl hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
+          disabled={!!usernameError}
+          className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow-xl hover:scale-[1.01] transition-transform flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span>Complete Business Registration</span>
           <ArrowRight className="w-4 h-4" />
