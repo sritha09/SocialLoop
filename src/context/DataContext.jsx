@@ -7,8 +7,7 @@ import {
   INITIAL_MESSAGES,
   INITIAL_NOTIFICATIONS,
   INITIAL_REVIEWS,
-  INITIAL_POSTS,
-  INITIAL_STORIES
+  INITIAL_POSTS
 } from '../mockData/initialData';
 
 const DataContext = createContext();
@@ -54,11 +53,6 @@ export const DataProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : INITIAL_POSTS;
   });
 
-  const [stories, setStories] = useState(() => {
-    const saved = localStorage.getItem('sl_stories');
-    return saved ? JSON.parse(saved) : INITIAL_STORIES;
-  });
-
   const [followingMap, setFollowingMap] = useState(() => {
     const saved = localStorage.getItem('sl_following');
     return saved ? JSON.parse(saved) : { i1: ['b1', 'b2'], b1: ['i1'] };
@@ -73,7 +67,6 @@ export const DataProvider = ({ children }) => {
   useEffect(() => { localStorage.setItem('sl_reviews', JSON.stringify(reviews)); }, [reviews]);
   useEffect(() => { localStorage.setItem('sl_saved_campaigns', JSON.stringify(savedCampaigns)); }, [savedCampaigns]);
   useEffect(() => { localStorage.setItem('sl_posts', JSON.stringify(posts)); }, [posts]);
-  useEffect(() => { localStorage.setItem('sl_stories', JSON.stringify(stories)); }, [stories]);
   useEffect(() => { localStorage.setItem('sl_following', JSON.stringify(followingMap)); }, [followingMap]);
 
   // CAMPAIGN ACTIONS
@@ -264,34 +257,6 @@ export const DataProvider = ({ children }) => {
     }));
   };
 
-  // STORY ACTIONS
-  const addStory = (storyData) => {
-    const newStory = {
-      id: 's' + Date.now(),
-      viewsCount: 1,
-      createdAt: new Date().toISOString(),
-      hasUnseen: true,
-      ...storyData
-    };
-    setStories(prev => [newStory, ...prev]);
-
-    confetti({ particleCount: 50, spread: 40 });
-    return newStory;
-  };
-
-  const viewStory = (storyId, viewerId) => {
-    setStories(prev => prev.map(s => {
-      if (s.id === storyId) {
-        return {
-          ...s,
-          viewsCount: (s.viewsCount || 0) + 1,
-          hasUnseen: false
-        };
-      }
-      return s;
-    }));
-  };
-
   // FOLLOW ACTIONS
   const followUser = (currentUserId, targetUserId) => {
     setFollowingMap(prev => {
@@ -367,14 +332,6 @@ export const DataProvider = ({ children }) => {
     );
   };
 
-  // Filter active 24-hour stories
-  const activeStories = stories.filter(s => {
-    if (!s.createdAt) return true;
-    const storyTime = new Date(s.createdAt).getTime();
-    const now = Date.now();
-    return now - storyTime < 24 * 60 * 60 * 1000;
-  });
-
   return (
     <DataContext.Provider value={{
       campaigns,
@@ -400,9 +357,6 @@ export const DataProvider = ({ children }) => {
       addPost,
       likePost,
       commentPost,
-      stories: activeStories,
-      addStory,
-      viewStory,
       followingMap,
       followUser
     }}>

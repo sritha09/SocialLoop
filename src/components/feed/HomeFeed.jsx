@@ -6,28 +6,17 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useCurrency } from '../../context/CurrencyContext';
-import { StoriesBar } from './StoriesBar';
-import { StoryViewerModal } from './StoryViewerModal';
 import { CreatePostModal } from './CreatePostModal';
-import { CreateStoryModal } from './CreateStoryModal';
 import { PostDetailModal } from './PostDetailModal';
 
 export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onChatClick }) => {
   const { currentUser, users } = useAuth();
-  const { posts, campaigns, stories, likePost, commentPost, followUser, followingMap } = useData();
+  const { posts, campaigns, likePost, commentPost, followUser, followingMap } = useData();
   const { formatCurrency } = useCurrency();
 
-  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
-  const [isCreateStoryOpen, setIsCreateStoryOpen] = useState(false);
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
-
-  const handleOpenStory = (story, idx = 0) => {
-    setActiveStoryIndex(idx);
-    setIsStoryViewerOpen(true);
-  };
 
   const handleCommentSubmit = (postId, e) => {
     e.preventDefault();
@@ -75,12 +64,6 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       
-      {/* TOP STORIES ROW */}
-      <StoriesBar 
-        openStoryViewer={handleOpenStory} 
-        openCreateStoryModal={() => setIsCreateStoryOpen(true)} 
-      />
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* MAIN FEED (LEFT 7 COLUMNS) */}
@@ -409,22 +392,9 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
       </div>
 
       {/* MODALS */}
-      <StoryViewerModal 
-        stories={stories}
-        activeIndex={activeStoryIndex}
-        isOpen={isStoryViewerOpen} 
-        onClose={() => setIsStoryViewerOpen(false)}
-        onIndexChange={setActiveStoryIndex}
-      />
-
       <CreatePostModal 
         isOpen={isCreatePostOpen} 
         onClose={() => setIsCreatePostOpen(false)} 
-      />
-
-      <CreateStoryModal 
-        isOpen={isCreateStoryOpen} 
-        onClose={() => setIsCreateStoryOpen(false)} 
       />
 
       <PostDetailModal

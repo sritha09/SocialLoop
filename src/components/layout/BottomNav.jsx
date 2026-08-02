@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Home, Compass, PlusCircle, MessageSquare, User, Sparkles, Image, Zap, Plus } from 'lucide-react';
+import { Home, Compass, PlusCircle, MessageSquare, User, Image, Plus } from 'lucide-react';
 
 export const BottomNav = ({ 
   activeView, 
   setActiveView, 
   openCreateCampaignModal,
-  openCreatePostModal,
-  openCreateStoryModal
+  openCreatePostModal
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -20,7 +19,7 @@ export const BottomNav = ({
 
   return (
     <>
-      {/* POPUP ACTION CHOOSER MENU FOR CREATING POST/STORY/CAMPAIGN */}
+      {/* POPUP ACTION CHOOSER MENU FOR CREATING POST OR CAMPAIGN */}
       {isMenuOpen && (
         <div 
           onClick={() => setIsMenuOpen(false)}
@@ -36,7 +35,7 @@ export const BottomNav = ({
 
             <button
               onClick={() => { setIsMenuOpen(false); openCreatePostModal(); }}
-              className="w-full p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-[#6D5EF8] dark:text-[#8B7CFF] font-bold text-xs flex items-center gap-3 hover:scale-[1.02] transition-transform"
+              className="w-full p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-[#6D5EF8] dark:text-[#8B7CFF] font-bold text-xs flex items-center gap-3 hover:scale-[1.02] transition-transform"
             >
               <div className="p-2 rounded-xl bg-[#6D5EF8] text-white">
                 <Image className="w-4 h-4" />
@@ -48,21 +47,8 @@ export const BottomNav = ({
             </button>
 
             <button
-              onClick={() => { setIsMenuOpen(false); openCreateStoryModal(); }}
-              className="w-full p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 font-bold text-xs flex items-center gap-3 hover:scale-[1.02] transition-transform"
-            >
-              <div className="p-2 rounded-xl bg-purple-600 text-white">
-                <Zap className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <div className="font-bold">Create Story</div>
-                <div className="text-[10px] text-slate-500 font-normal">Add a 24-hour photo or video story</div>
-              </div>
-            </button>
-
-            <button
               onClick={() => { setIsMenuOpen(false); openCreateCampaignModal(); }}
-              className="w-full p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center gap-3 hover:scale-[1.02] transition-transform"
+              className="w-full p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center gap-3 hover:scale-[1.02] transition-transform"
             >
               <div className="p-2 rounded-xl bg-emerald-600 text-white">
                 <Plus className="w-4 h-4" />
