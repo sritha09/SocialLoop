@@ -46,8 +46,12 @@ export const ChatWindow = ({ targetUserId }) => {
     }
   }, [targetUserId]);
 
+  const messagesContainerRef = useRef(null);
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [conversationMessages, isTyping]);
 
   const handleSelectPartner = (partnerId) => {
@@ -251,7 +255,7 @@ export const ChatWindow = ({ targetUserId }) => {
         )}
 
         {/* MESSAGES THREAD */}
-        <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs sm:text-sm">
+        <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto space-y-3 text-xs sm:text-sm">
           {conversationMessages.map((msg) => {
             const isMe = msg.senderId === currentUser?.id;
             const currentReaction = reactions[msg.id];

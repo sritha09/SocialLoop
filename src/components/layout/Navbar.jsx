@@ -34,14 +34,8 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
     setActiveView('feed');
   };
 
-  const scrollToSection = (sectionId) => {
-    if (activeView !== 'landing') {
-      setActiveView('landing');
-    }
-    setTimeout(() => {
-      const el = document.getElementById(sectionId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+  const navigateSection = (sectionId) => {
+    setActiveView('landing');
     setIsMobileMenuOpen(false);
   };
 
@@ -67,13 +61,13 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
                 Home
               </button>
               <button
-                onClick={() => scrollToSection('features')}
+                onClick={() => navigateSection('features')}
                 className="px-4 py-1.5 text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8] rounded-full transition-all"
               >
                 Features
               </button>
               <button
-                onClick={() => scrollToSection('how-it-works')}
+                onClick={() => navigateSection('how-it-works')}
                 className="px-4 py-1.5 text-slate-600 dark:text-slate-300 hover:text-[#6D5EF8] rounded-full transition-all"
               >
                 How It Works
@@ -333,8 +327,8 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
           {!currentUser ? (
             <>
               <button onClick={() => handleNavClick('landing')} className="block w-full text-left py-2 font-bold text-[#6D5EF8]">Home</button>
-              <button onClick={() => scrollToSection('features')} className="block w-full text-left py-2">Features</button>
-              <button onClick={() => scrollToSection('how-it-works')} className="block w-full text-left py-2">How It Works</button>
+              <button onClick={() => navigateSection('features')} className="block w-full text-left py-2">Features</button>
+              <button onClick={() => navigateSection('how-it-works')} className="block w-full text-left py-2">How It Works</button>
               <button onClick={() => openLegalModal('about')} className="block w-full text-left py-2">About</button>
             </>
           ) : (

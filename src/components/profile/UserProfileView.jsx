@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { 
-  ShieldCheck, Star, MapPin, Globe, Users, Award, MessageSquare, UserPlus, Grid, Handshake
+  ShieldCheck, Star, MapPin, Globe, Users, Award, MessageSquare, UserPlus, Grid, Handshake, Edit3
 } from 'lucide-react';
 import { InstagramIcon, YoutubeIcon, TwitterIcon, LinkedinIcon } from '../common/Icons';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { EditProfileModal } from './EditProfileModal';
 
 export const UserProfileView = ({ userId, onChatClick }) => {
   const { currentUser, users } = useAuth();
   const { reviews, campaigns, posts, followUser, followingMap } = useData();
 
   const [activeTab, setActiveTab] = useState('posts'); // 'posts', 'collabs', 'reviews'
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   const profileUser = users.find(u => u.id === userId) || currentUser;
   const isBusiness = profileUser?.role === 'business';
@@ -82,7 +84,15 @@ export const UserProfileView = ({ userId, onChatClick }) => {
 
             {/* ACTION BUTTONS */}
             <div className="flex items-center justify-center gap-3">
-              {currentUser?.id !== profileUser.id && (
+              {currentUser?.id === profileUser.id ? (
+                <button
+                  onClick={() => setIsEditProfileOpen(true)}
+                  className="px-5 py-2.5 rounded-xl gradient-button text-white font-bold text-xs shadow flex items-center gap-1.5"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  <span>Edit Profile</span>
+                </button>
+              ) : (
                 <>
                   <button
                     onClick={() => followUser(currentUser?.id, profileUser.id)}
@@ -251,6 +261,12 @@ export const UserProfileView = ({ userId, onChatClick }) => {
         )}
 
       </div>
+
+      {/* EDIT PROFILE MODAL */}
+      <EditProfileModal 
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+      />
 
     </div>
   );
