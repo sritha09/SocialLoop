@@ -1,16 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_USERS } from '../mockData/initialData';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState(() => {
-    const saved = localStorage.getItem('ic_users');
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+    const saved = localStorage.getItem('sl_users');
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('ic_current_user');
+    const saved = localStorage.getItem('sl_current_user');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -22,14 +21,14 @@ export const AuthProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('ic_users', JSON.stringify(users));
+    localStorage.setItem('sl_users', JSON.stringify(users));
   }, [users]);
 
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('ic_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('sl_current_user', JSON.stringify(currentUser));
     } else {
-      localStorage.removeItem('ic_current_user');
+      localStorage.removeItem('sl_current_user');
     }
   }, [currentUser]);
 
@@ -39,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
       return { success: true, user };
     }
-    return { success: false, message: 'Invalid credentials. Try using demo login!' };
+    return { success: false, message: 'Account not found. Please sign up to create your account!' };
   };
 
   const signup = (userData) => {
@@ -49,7 +48,9 @@ export const AuthProvider = ({ children }) => {
       followersCount: 0,
       followingCount: 0,
       postsCount: 0,
-      storiesCount: 0,
+      likesCount: 0,
+      commentsCount: 0,
+      savedPostsCount: 0,
       collaborationsCount: 0,
       campaignsCount: 0,
       notificationsCount: 0,
@@ -58,18 +59,16 @@ export const AuthProvider = ({ children }) => {
       reviewsCount: 0,
       completionScore: 100,
       isVerified: false,
+      avatar: userData.avatar || (userData.role === 'business'
+        ? 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=300'
+        : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300'),
+      logo: userData.logo || userData.avatar || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=300',
+      coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1200',
       ...userData,
     };
     setUsers(prev => [newUser, ...prev]);
     setCurrentUser(newUser);
     return newUser;
-  };
-
-  const switchDemoUser = (userId) => {
-    const found = users.find(u => u.id === userId);
-    if (found) {
-      setCurrentUser(found);
-    }
   };
 
   const updateUserProfile = (updatedData) => {
@@ -80,7 +79,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('ic_current_user');
     localStorage.removeItem('sl_current_user');
     setCurrentUser(null);
   };
@@ -92,7 +90,6 @@ export const AuthProvider = ({ children }) => {
       login,
       signup,
       logout,
-      switchDemoUser,
       updateUserProfile,
       isBusiness: currentUser?.role === 'business',
       isInfluencer: currentUser?.role === 'influencer',
