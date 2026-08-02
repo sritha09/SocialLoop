@@ -2,11 +2,22 @@ import React from 'react';
 import { X, QrCode, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export const QRCodeModal = ({ deal, isOpen, onClose }) => {
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !deal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-sm glass-panel rounded-3xl p-6 shadow-2xl border border-white/20 dark:border-white/10 text-center space-y-4">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-sm glass-panel rounded-3xl p-6 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] text-center space-y-4 overflow-y-auto">
         
         <button
           onClick={onClose}

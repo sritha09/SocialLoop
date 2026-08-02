@@ -14,6 +14,17 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
   const [expectedPrice, setExpectedPrice] = useState(campaign?.budget || 450);
   const [portfolioLink, setPortfolioLink] = useState(currentUser?.instagram || 'https://instagram.com/mayacreates');
 
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !campaign) return null;
 
   const handleSubmit = (e) => {
@@ -30,8 +41,8 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-8">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}

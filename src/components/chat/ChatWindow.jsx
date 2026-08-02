@@ -384,14 +384,29 @@ export const ChatWindow = ({ targetUserId }) => {
             <Mic className="w-5 h-5" />
           </button>
 
-          <button
-            type="button"
-            onClick={() => setAttachedImage('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=600')}
-            className={`p-2 transition-colors ${attachedImage ? 'text-[#6D5EF8] font-bold' : 'text-slate-400 hover:text-[#6D5EF8]'}`}
-            title="Attach Image"
+          <label
+            htmlFor="chat-file-input"
+            className={`p-2 transition-colors cursor-pointer ${attachedImage ? 'text-[#6D5EF8] font-bold' : 'text-slate-400 hover:text-[#6D5EF8]'}`}
+            title="Attach Image from Device Gallery or Computer"
           >
             <Image className="w-5 h-5" />
-          </button>
+          </label>
+          <input 
+            id="chat-file-input"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  if (reader.result) setAttachedImage(reader.result.toString());
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+            className="hidden"
+          />
 
           <input 
             type="text" 

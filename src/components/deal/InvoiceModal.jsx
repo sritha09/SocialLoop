@@ -2,6 +2,17 @@ import React from 'react';
 import { X, Printer, Download, Sparkles, ShieldCheck } from 'lucide-react';
 
 export const InvoiceModal = ({ deal, isOpen, onClose }) => {
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !deal) return null;
 
   const handlePrint = () => {
@@ -9,8 +20,8 @@ export const InvoiceModal = ({ deal, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-2xl glass-panel bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-white/10 my-8">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-2xl glass-panel bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-white/10 my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}

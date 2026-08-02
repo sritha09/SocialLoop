@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, PlusCircle, Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Upload, Check, Wand2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, PlusCircle, Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Upload, Check, Wand2, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
@@ -9,7 +9,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
 
   const [formData, setFormData] = useState({
     title: '',
-    campaignType: 'Promotion', // 'Promotion' or 'Collaboration'
+    campaignType: 'Promotion',
     description: '',
     businessCategory: currentUser?.category || 'Cafe & Restaurant',
     state: currentUser?.state || 'California',
@@ -31,7 +31,31 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
 
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setFormData(prev => ({ ...prev, image: reader.result.toString() }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handlePlatformToggle = (platform) => {
     setFormData(prev => {
@@ -67,12 +91,12 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-3xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-3xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors"
+          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -81,7 +105,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-white/10">
           <div>
             <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <PlusCircle className="w-6 h-6 text-indigo-500" />
+              <PlusCircle className="w-6 h-6 text-[#6D5EF8]" />
               <span>Create New Campaign</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -112,7 +136,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
                 placeholder="e.g. Cold Brew Tasting Reel Campaign"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8] font-medium"
               />
             </div>
 
@@ -121,7 +145,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
               <select
                 value={formData.campaignType}
                 onChange={e => setFormData({ ...formData, campaignType: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8] font-medium"
               >
                 <option value="Promotion">Promotion (One-Time)</option>
                 <option value="Collaboration">Collaboration (Long-Term)</option>
@@ -138,7 +162,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
               placeholder="Detail what content is expected (e.g. 1 Reel, 3 IG Stories), event details, free products provided, etc."
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 font-normal"
+              className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8] font-normal"
             ></textarea>
           </div>
 
@@ -233,73 +257,35 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* MIN / MAX FOLLOWERS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Minimum Followers Required</label>
+          {/* COVER IMAGE & DEVICE FILE PICKER */}
+          <div className="space-y-2 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Campaign Header Image</label>
+            {formData.image && (
+              <img src={formData.image} alt="Campaign preview" className="w-full h-36 rounded-xl object-cover mb-2 border border-slate-300" />
+            )}
+            <div className="flex items-center gap-3">
+              <label 
+                htmlFor="camp-file-input"
+                className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs shadow cursor-pointer hover:bg-[#5847E0] transition-colors inline-flex items-center gap-2"
+              >
+                <ImageIcon className="w-4 h-4" />
+                <span>📁 Select Image from Device Gallery or Computer</span>
+              </label>
               <input 
-                type="number"
-                placeholder="10000"
-                value={formData.minFollowers}
-                onChange={e => setFormData({ ...formData, minFollowers: Number(e.target.value) })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none"
+                id="camp-file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
               />
             </div>
-
-            <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Maximum Followers Target</label>
-              <input 
-                type="number"
-                placeholder="200000"
-                value={formData.maxFollowers}
-                onChange={e => setFormData({ ...formData, maxFollowers: Number(e.target.value) })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none"
-              />
-            </div>
-          </div>
-
-          {/* PREFERRED PLATFORMS */}
-          <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-2">Preferred Creator Platforms</label>
-            <div className="flex flex-wrap gap-2">
-              {['Instagram', 'YouTube', 'TikTok', 'Facebook', 'LinkedIn', 'Twitter/X'].map(p => {
-                const selected = formData.platforms.includes(p);
-                return (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => handlePlatformToggle(p)}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                      selected 
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow' 
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-indigo-400'
-                    }`}
-                  >
-                    {selected && <Check className="w-3.5 h-3.5" />}
-                    <span>{p}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* COVER IMAGE */}
-          <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Campaign Header Image URL</label>
-            <input 
-              type="url"
-              placeholder="https://images.unsplash.com/..."
-              value={formData.image}
-              onChange={e => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none"
-            />
           </div>
 
           {/* SUBMIT BUTTON */}
-          <div className="pt-3">
+          <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-sm shadow-xl shadow-indigo-500/30 hover:scale-[1.01] transition-transform"
+              className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow mt-2"
             >
               Publish Campaign
             </button>

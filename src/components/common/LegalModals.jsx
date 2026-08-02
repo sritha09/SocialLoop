@@ -2,11 +2,22 @@ import React from 'react';
 import { X, ShieldCheck, FileText, HelpCircle, Briefcase, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export const LegalModals = ({ activeModal, onClose }) => {
+  React.useEffect(() => {
+    if (activeModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [activeModal]);
+
   if (!activeModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-2xl glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-8 max-h-[85vh] overflow-y-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-2xl glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[85vh] overflow-y-auto">
         
         <button
           onClick={onClose}

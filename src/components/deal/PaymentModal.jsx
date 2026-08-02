@@ -9,6 +9,17 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
   const [paymentOption, setPaymentOption] = useState('Online');
   const [processingState, setProcessingState] = useState('idle');
 
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !deal) return null;
 
   const handleOnlinePayment = (e) => {
@@ -43,14 +54,14 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
 
   const steps = [
     { num: 1, title: 'Terms Agreed', done: true },
-    { num: 2, title: 'Escrow Funded', done: deal.paymentStatus === 'Completed' || processingState === 'success' },
-    { num: 3, title: 'Deliverable Submitted', done: deal.status === 'Submitted' || deal.status === 'Completed' },
-    { num: 4, title: 'Funds Released', done: deal.status === 'Completed' },
+    { num: 2, title: 'Escrow Funded', done: deal.paymentStatus === 'Completed' },
+    { num: 3, title: 'Content Live', done: deal.status === 'Completed' },
+    { num: 4, title: 'Payout Released', done: deal.status === 'Completed' }
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-xl glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-8">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-xl glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}

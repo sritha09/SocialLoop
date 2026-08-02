@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Image, MapPin, Tag, Sparkles, UploadCloud, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Image as ImageIcon, MapPin, Tag, Sparkles, UploadCloud, Eye } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
@@ -13,7 +13,31 @@ export const CreatePostModal = ({ isOpen, onClose }) => {
   const [hashtags, setHashtags] = useState('SocialLoop, CreatorsOfSF, BrandCollab');
   const [visibility, setVisibility] = useState('Public');
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setImageUrl(reader.result.toString());
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,12 +64,12 @@ export const CreatePostModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors"
+          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -62,27 +86,33 @@ export const CreatePostModal = ({ isOpen, onClose }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
           
-          {/* DRAG AND DROP PREVIEW UI BOX */}
-          <div className="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 text-center space-y-2">
+          {/* NATIVE DEVICE FILE UPLOAD BOX */}
+          <div className="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 text-center space-y-3">
             {imageUrl ? (
               <div className="relative max-h-48 overflow-hidden rounded-xl bg-black">
                 <img src={imageUrl} alt="Preview" className="w-full h-44 object-cover" />
               </div>
             ) : (
-              <div className="py-6 space-y-2">
+              <div className="py-4 space-y-2">
                 <UploadCloud className="w-8 h-8 text-[#6D5EF8] mx-auto" />
-                <p className="font-bold text-slate-700 dark:text-slate-300 text-xs">Drag and drop images/videos or paste media URL below</p>
+                <p className="font-bold text-slate-700 dark:text-slate-300 text-xs">Select image/video from your phone gallery or computer</p>
               </div>
             )}
 
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-500 mb-1 text-left">Media File URL / Image Link</label>
+            <div className="flex flex-col items-center gap-2 pt-1">
+              <label 
+                htmlFor="post-file-input"
+                className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs shadow-md cursor-pointer hover:bg-[#5847E0] transition-colors inline-flex items-center gap-2"
+              >
+                <ImageIcon className="w-4 h-4" />
+                <span>📁 Upload Photo / Video from Device</span>
+              </label>
               <input 
-                type="text"
-                required
-                value={imageUrl}
-                onChange={e => setImageUrl(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none text-xs"
+                id="post-file-input"
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className="hidden"
               />
             </div>
           </div>

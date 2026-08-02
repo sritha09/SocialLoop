@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Sparkles, Camera, Image, User, Globe, MapPin, Tag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Sparkles, Camera, Image as ImageIcon, User, Globe, MapPin, Tag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const EditProfileModal = ({ isOpen, onClose }) => {
@@ -19,7 +19,44 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
   const [twitter, setTwitter] = useState(currentUser?.twitter || '');
   const [linkedin, setLinkedin] = useState(currentUser?.linkedin || '');
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !currentUser) return null;
+
+  const handleAvatarFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setAvatar(reader.result.toString());
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCoverFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setCoverImage(reader.result.toString());
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,12 +81,12 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors"
+          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -101,24 +138,47 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* DEVICE MEDIA UPLOADS FOR AVATAR AND COVER */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 border border-[#ECECF3] dark:border-[#26334D]">
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Profile Avatar Image URL</label>
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Profile Picture (Avatar)</label>
+              {avatar && (
+                <img src={avatar} alt="Avatar Preview" className="w-14 h-14 rounded-full object-cover mb-2 border border-[#6D5EF8]" />
+              )}
+              <label 
+                htmlFor="avatar-file-input"
+                className="px-3 py-1.5 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs cursor-pointer hover:bg-[#5847E0] transition-colors inline-flex items-center gap-1.5"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Upload Profile Photo</span>
+              </label>
               <input 
-                type="text"
-                value={avatar}
-                onChange={e => setAvatar(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none text-xs"
+                id="avatar-file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarFileChange}
+                className="hidden"
               />
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Cover Banner Image URL</label>
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Cover Banner Photo</label>
+              {coverImage && (
+                <img src={coverImage} alt="Cover Preview" className="w-full h-14 rounded-xl object-cover mb-2 border border-slate-300" />
+              )}
+              <label 
+                htmlFor="cover-file-input"
+                className="px-3 py-1.5 rounded-xl bg-slate-800 text-white font-bold text-xs cursor-pointer hover:bg-slate-700 transition-colors inline-flex items-center gap-1.5"
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Upload Cover Banner</span>
+              </label>
               <input 
-                type="text"
-                value={coverImage}
-                onChange={e => setCoverImage(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none text-xs"
+                id="cover-file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleCoverFileChange}
+                className="hidden"
               />
             </div>
           </div>
@@ -156,7 +216,7 @@ export const EditProfileModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-2 gap-3 pt-1">
             <div>
               <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Instagram Profile</label>
               <input 

@@ -8,14 +8,20 @@ export const StoryViewerModal = ({ story, isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen && story) {
       viewStory(story.id);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, story]);
 
   if (!isOpen || !story) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-sm h-[80vh] rounded-3xl overflow-hidden shadow-2xl bg-black flex flex-col justify-between border border-white/10">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-sm h-[80vh] my-auto rounded-3xl overflow-hidden shadow-2xl bg-black flex flex-col justify-between border border-white/10">
         
         {/* TOP PROGRESS BAR & AUTHOR HEADER */}
         <div className="p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-20 space-y-3">

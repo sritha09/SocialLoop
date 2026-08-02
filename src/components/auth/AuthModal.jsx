@@ -14,6 +14,17 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
   const { login, switchDemoUser } = useAuth();
 
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleLoginSubmit = (e) => {
@@ -32,8 +43,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-auto max-h-[90vh] overflow-y-auto">
         
         {/* CLOSE BUTTON */}
         <button

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Sparkles, UploadCloud, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
@@ -10,7 +10,31 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
   const [caption, setCaption] = useState('');
   const [mediaUrl, setMediaUrl] = useState('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=800');
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setMediaUrl(reader.result.toString());
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,12 +54,12 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-sm glass-panel rounded-2xl p-6 shadow-2xl border border-[#ECECF3] dark:border-[#26334D]">
+    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-sm glass-panel rounded-3xl p-6 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
         
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors"
+          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -51,6 +75,33 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+          
+          {/* MEDIA PREVIEW & FILE UPLOAD */}
+          <div className="p-3 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 text-center space-y-2">
+            {mediaUrl && (
+              <div className="relative max-h-40 overflow-hidden rounded-xl bg-black">
+                <img src={mediaUrl} alt="Story preview" className="w-full h-36 object-cover" />
+              </div>
+            )}
+
+            <div className="flex flex-col items-center gap-2 pt-1">
+              <label 
+                htmlFor="story-file-input"
+                className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs shadow cursor-pointer hover:bg-[#5847E0] transition-colors inline-flex items-center gap-2"
+              >
+                <ImageIcon className="w-4 h-4" />
+                <span>📁 Select Photo from Device Gallery</span>
+              </label>
+              <input 
+                id="story-file-input"
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Story Caption</label>
             <input 
@@ -58,17 +109,6 @@ export const CreateStoryModal = ({ isOpen, onClose }) => {
               placeholder="Behind the scenes at the cafe tasting..."
               value={caption}
               onChange={e => setCaption(e.target.value)}
-              className="w-full p-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none text-xs"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Image / Media URL</label>
-            <input 
-              type="text"
-              required
-              value={mediaUrl}
-              onChange={e => setMediaUrl(e.target.value)}
               className="w-full p-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none text-xs"
             />
           </div>
