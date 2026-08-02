@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { BusinessSignupForm } from './BusinessSignupForm';
 import { InfluencerSignupForm } from './InfluencerSignupForm';
 
+import { Modal } from '../common/Modal';
+
 export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'business' }) => {
   const [mode, setMode] = useState(initialMode); // 'login' or 'signup'
   const [role, setRole] = useState(initialRole); // 'business' or 'influencer'
@@ -12,20 +14,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
   const [loginPassword, setLoginPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const { login, switchDemoUser } = useAuth();
-
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+  const { login } = useAuth();
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
@@ -37,22 +26,8 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
     }
   };
 
-  const handleDemoLogin = (userId) => {
-    switchDemoUser(userId);
-    onClose();
-  };
-
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-auto max-h-[90vh] overflow-y-auto">
-        
-        {/* CLOSE BUTTON */}
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
 
         {/* HEADER */}
         <div className="text-center space-y-2 mb-6">
@@ -185,8 +160,6 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
           </div>
         )}
-
-      </div>
-    </div>
+    </Modal>
   );
 };

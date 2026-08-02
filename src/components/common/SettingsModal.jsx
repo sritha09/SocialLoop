@@ -4,34 +4,15 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useCurrency } from '../../context/CurrencyContext';
 
+import { Modal } from './Modal';
+
 export const SettingsModal = ({ isOpen, onClose }) => {
   const { currentUser, isBusiness } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { currencyCode, setCurrencyCode, currencies } = useCurrency();
 
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
-        
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-lg">
 
         <div className="space-y-1 mb-6">
           <h3 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
@@ -108,7 +89,6 @@ export const SettingsModal = ({ isOpen, onClose }) => {
 
         </div>
 
-      </div>
-    </div>
+    </Modal>
   );
 };

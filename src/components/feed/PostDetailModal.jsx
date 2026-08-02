@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { X, Heart, MessageCircle, Share2, Bookmark, ShieldCheck, MapPin, Send, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Heart, MessageCircle, Share2, Bookmark, ShieldCheck, MapPin, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { Modal } from '../common/Modal';
 
 export const PostDetailModal = ({ post, isOpen, onClose }) => {
   const { currentUser } = useAuth();
@@ -10,19 +11,7 @@ export const PostDetailModal = ({ post, isOpen, onClose }) => {
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [commentText, setCommentText] = useState('');
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      setActiveMediaIndex(0);
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, post]);
-
-  if (!isOpen || !post) return null;
+  if (!post) return null;
 
   const hasLiked = post.likedBy?.includes(currentUser?.id);
   const isFollowing = (followingMap[currentUser?.id] || []).includes(post.authorId);
@@ -43,17 +32,9 @@ export const PostDetailModal = ({ post, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-3xl glass-panel rounded-3xl overflow-hidden shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] flex flex-col md:flex-row">
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-3xl">
+      <div className="flex flex-col md:flex-row -m-6 sm:-m-8">
         
-        {/* CLOSE BUTTON */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/80 text-white hover:text-rose-500 transition-colors z-30"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
         {/* LEFT MEDIA DISPLAY AREA */}
         <div className="w-full md:w-7/12 bg-black flex items-center justify-center relative min-h-[300px] md:min-h-[500px]">
           {mediaItems.length > 0 && (
@@ -201,6 +182,6 @@ export const PostDetailModal = ({ post, isOpen, onClose }) => {
         </div>
 
       </div>
-    </div>
+    </Modal>
   );
 };

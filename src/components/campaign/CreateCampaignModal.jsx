@@ -3,6 +3,8 @@ import { X, PlusCircle, Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Up
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
+import { Modal } from '../common/Modal';
+
 export const CreateCampaignModal = ({ isOpen, onClose }) => {
   const { currentUser } = useAuth();
   const { createCampaign } = useData();
@@ -12,9 +14,9 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
     campaignType: 'Promotion',
     description: '',
     businessCategory: currentUser?.category || 'Cafe & Restaurant',
-    state: currentUser?.state || 'California',
-    city: currentUser?.city || 'San Francisco',
-    venue: currentUser?.location || 'San Francisco Flagship Venue',
+    state: currentUser?.state || '',
+    city: currentUser?.city || 'Hyderabad',
+    venue: currentUser?.location || 'Hyderabad Flagship Venue',
     date: '2026-08-20',
     time: '18:00',
     duration: '2 Hours',
@@ -30,19 +32,6 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
   });
 
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -91,15 +80,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-3xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-auto max-h-[90vh] overflow-y-auto">
-        
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors z-10"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-3xl">
 
         {/* HEADER & AI ASSISTANT BUTTON */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-white/10">
@@ -292,7 +273,6 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
           </div>
 
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 };

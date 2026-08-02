@@ -37,7 +37,6 @@ import { UserProfileView } from './components/profile/UserProfileView';
 import { PaymentModal } from './components/deal/PaymentModal';
 import { InvoiceModal } from './components/deal/InvoiceModal';
 import { QRCodeModal } from './components/common/QRCodeModal';
-import { AIChatbot } from './components/ai/AIChatbot';
 
 import { BottomNav } from './components/layout/BottomNav';
 
@@ -232,9 +231,6 @@ const MainAppContent = () => {
           openCreatePostModal={() => setIsCreatePostOpen(true)}
         />
       )}
-
-      {/* FLOATING AI COPILOT BOT */}
-      <AIChatbot />
 
       {/* MODALS */}
       <AuthModal 

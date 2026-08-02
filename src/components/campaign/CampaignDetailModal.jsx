@@ -2,49 +2,28 @@ import React from 'react';
 import { X, MapPin, Calendar, Clock, DollarSign, Users, CheckCircle2, MessageSquare, Send, Globe, ShieldCheck } from 'lucide-react';
 import { InstagramIcon } from '../common/Icons';
 import { useAuth } from '../../context/AuthContext';
+import { Modal } from '../common/Modal';
 
 export const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplyClick, onChatClick }) => {
   const { users, isInfluencer } = useAuth();
 
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen || !campaign) return null;
+  if (!campaign) return null;
 
   const business = users.find(u => u.id === campaign.businessId) || {
-    name: 'Artisan Roast Cafe',
+    name: campaign.businessCategory || 'Partner Brand',
     logo: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=300',
-    description: 'Specialty coffee house and bakery.',
-    instagram: 'https://instagram.com/artisanroast',
-    website: 'https://artisanroast.com',
-    location: 'San Francisco, CA',
+    description: 'Verified platform advertiser.',
+    location: campaign.city || 'Hyderabad',
     isVerified: true
   };
 
   const handleChatClick = (businessId) => {
-    onClose(); // Automatically close modal first!
-    onChatClick(businessId); // Then navigate directly to Chat interface
+    onClose();
+    onChatClick(businessId);
   };
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-3xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
-        
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 z-10 p-2 rounded-full bg-slate-900/60 text-white hover:bg-slate-900 hover:text-rose-500 transition-colors backdrop-blur-md"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-3xl">
         <div className="relative h-56 -mx-6 sm:-mx-8 -mt-6 sm:-mt-8 mb-6 overflow-hidden rounded-t-3xl">
           <img 
             src={campaign.image} 
@@ -163,9 +142,7 @@ export const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplyClick, o
               </button>
             )}
           </div>
-
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 };

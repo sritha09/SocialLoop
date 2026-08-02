@@ -3,6 +3,8 @@ import { X, Send, Calendar, DollarSign, Link, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
+import { Modal } from '../common/Modal';
+
 export const ApplyModal = ({ campaign, isOpen, onClose }) => {
   const { currentUser } = useAuth();
   const { submitApplication } = useData();
@@ -14,18 +16,7 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
   const [expectedPrice, setExpectedPrice] = useState(campaign?.budget || 450);
   const [portfolioLink, setPortfolioLink] = useState(currentUser?.instagram || 'https://instagram.com/mayacreates');
 
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  if (!isOpen || !campaign) return null;
+  if (!campaign) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -41,16 +32,7 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-xl glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-auto max-h-[90vh] overflow-y-auto">
-        
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-xl">
         <div className="space-y-2 mb-6">
           <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider border border-indigo-500/20">
             Campaign Application
@@ -135,7 +117,6 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
 
         </form>
 
-      </div>
-    </div>
+    </Modal>
   );
 };

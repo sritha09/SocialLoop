@@ -26,8 +26,9 @@ export const UserProfileView = ({ userId, onChatClick }) => {
   const userCampaigns = campaigns.filter(c => c.businessId === profileUser?.id);
 
   const isFollowing = (followingMap[currentUser?.id] || []).includes(profileUser.id);
-  const followersCount = (profileUser.followersCount || 85000) + (isFollowing ? 1 : 0);
-  const followingCount = isBusiness ? 48 : 420;
+  const userFollowingList = followingMap[profileUser.id] || [];
+  const followersCount = (profileUser.followersCount || 0) + (isFollowing ? 1 : 0);
+  const followingCount = userFollowingList.length;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
