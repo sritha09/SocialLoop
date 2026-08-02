@@ -34,7 +34,7 @@ export const HowItWorksSection = () => {
             Simple 6-Step Blueprint
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            How <span className="gradient-text">InfluenceConnect</span> Works
+            How <span className="text-[#6D5EF8]">SocialLoop</span> Works
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-base">
             Seamless end-to-end workflow tailored specifically for business owners and content creators.

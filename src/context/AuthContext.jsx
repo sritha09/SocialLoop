@@ -15,10 +15,10 @@ export const AuthProvider = ({ children }) => {
       try {
         return JSON.parse(saved);
       } catch (e) {
-        return INITIAL_USERS[0]; // Default to Artisan Roast Cafe (Business)
+        return null;
       }
     }
-    return INITIAL_USERS[0];
+    return null;
   });
 
   useEffect(() => {

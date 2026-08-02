@@ -74,7 +74,7 @@ export const InvoiceModal = ({ deal, isOpen, onClose }) => {
                   <td className="py-3 text-right font-extrabold">${deal.finalPrice}</td>
                 </tr>
                 <tr>
-                  <td className="py-3 text-slate-500">InfluenceConnect Platform Escrow Protection Fee</td>
+                  <td className="py-3 text-slate-500">SocialLoop Platform Escrow Protection Fee</td>
                   <td className="py-3 text-right">1</td>
                   <td className="py-3 text-right text-emerald-500 font-bold">$0.00 (Waived)</td>
                 </tr>

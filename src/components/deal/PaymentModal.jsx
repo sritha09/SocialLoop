@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { X, CreditCard, Lock, CheckCircle2, DollarSign, ArrowRight, ShieldCheck, RefreshCw } from 'lucide-react';
+import { X, CreditCard, Lock, CheckCircle2, DollarSign, ShieldCheck, RefreshCw, Check, ArrowRight } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import confetti from 'canvas-confetti';
 
 export const PaymentModal = ({ deal, isOpen, onClose }) => {
   const { updateDealPaymentStatus } = useData();
 
-  const [paymentOption, setPaymentOption] = useState('Online'); // 'Online' or 'Offline'
-  const [processingState, setProcessingState] = useState('idle'); // 'idle', 'processing', 'success'
+  const [paymentOption, setPaymentOption] = useState('Online');
+  const [processingState, setProcessingState] = useState('idle');
 
   if (!isOpen || !deal) return null;
 
@@ -23,7 +23,7 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
         status: 'Active'
       });
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    }, 2000);
+    }, 1800);
   };
 
   const handleOfflineBusinessClick = () => {
@@ -41,13 +41,20 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
   };
 
+  const steps = [
+    { num: 1, title: 'Terms Agreed', done: true },
+    { num: 2, title: 'Escrow Funded', done: deal.paymentStatus === 'Completed' || processingState === 'success' },
+    { num: 3, title: 'Deliverable Submitted', done: deal.status === 'Submitted' || deal.status === 'Completed' },
+    { num: 4, title: 'Funds Released', done: deal.status === 'Completed' },
+  ];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-lg glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20 dark:border-white/10 my-8">
+      <div className="relative w-full max-w-xl glass-panel rounded-2xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] my-8">
         
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors"
+          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -56,14 +63,39 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
         <div className="space-y-2 mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20">
             <ShieldCheck className="w-4 h-4" />
-            <span>Escrow Protected Payment Gateway</span>
+            <span>Escrow Payment Gateway</span>
           </div>
           <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-            Escrow Payment for Deal #{deal.id}
+            SocialLoop Escrow Workflow
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Total Amount: <span className="font-bold text-emerald-500">${deal.finalPrice}</span>
-          </p>
+        </div>
+
+        {/* STEP-BY-STEP PROGRESS INDICATOR */}
+        <div className="grid grid-cols-4 gap-2 mb-6 text-center text-[10px] sm:text-xs font-semibold">
+          {steps.map(step => (
+            <div key={step.num} className="space-y-1">
+              <div className={`w-7 h-7 rounded-full mx-auto flex items-center justify-center font-bold transition-all ${
+                step.done 
+                  ? 'bg-[#6D5EF8] text-white shadow-sm' 
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+              }`}>
+                {step.done ? <Check className="w-4 h-4" /> : step.num}
+              </div>
+              <p className={step.done ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-400'}>{step.title}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* DEAL SUMMARY CARD */}
+        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-[#ECECF3] dark:border-[#26334D] mb-6 flex items-center justify-between text-xs sm:text-sm">
+          <div>
+            <p className="text-slate-400 font-medium">Deal Contract #{deal.id}</p>
+            <p className="font-extrabold text-slate-900 dark:text-white">{deal.deliverables || 'Instagram Campaign Deliverables'}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-slate-400 font-medium">Total Amount</p>
+            <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">${deal.finalPrice}</p>
+          </div>
         </div>
 
         {/* OPTION SELECTOR (ONLINE VS OFFLINE) */}
@@ -71,27 +103,27 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
           <button
             type="button"
             onClick={() => setPaymentOption('Online')}
-            className={`p-3.5 rounded-2xl border-2 font-bold text-xs flex flex-col items-center gap-1.5 transition-all ${
+            className={`p-3 rounded-xl border-2 font-bold text-xs flex flex-col items-center gap-1.5 transition-all ${
               paymentOption === 'Online' 
-                ? 'border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-md' 
-                : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-indigo-300'
+                ? 'border-[#6D5EF8] bg-[#6D5EF8]/10 text-[#6D5EF8] dark:text-[#8B7CFF]' 
+                : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
             }`}
           >
             <CreditCard className="w-5 h-5" />
-            <span>Option 1: Online (Stripe/Razorpay)</span>
+            <span>Online (Stripe/Escrow)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setPaymentOption('Offline')}
-            className={`p-3.5 rounded-2xl border-2 font-bold text-xs flex flex-col items-center gap-1.5 transition-all ${
+            className={`p-3 rounded-xl border-2 font-bold text-xs flex flex-col items-center gap-1.5 transition-all ${
               paymentOption === 'Offline' 
-                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-md' 
-                : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-300'
+                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
             }`}
           >
             <DollarSign className="w-5 h-5" />
-            <span>Option 2: Offline Cash / Bank</span>
+            <span>Offline Cash / Transfer</span>
           </button>
         </div>
 
@@ -99,15 +131,14 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
         {paymentOption === 'Online' && (
           <div className="space-y-4">
             {processingState === 'idle' && (
-              <form onSubmit={handleOnlinePayment} className="space-y-4 text-xs sm:text-sm">
+              <form onSubmit={handleOnlinePayment} className="space-y-3.5 text-xs sm:text-sm">
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Cardholder Name</label>
                   <input 
                     type="text"
                     required
-                    placeholder="Elena Rostova"
                     defaultValue="Elena Rostova"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none"
                   />
                 </div>
 
@@ -118,9 +149,8 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
                     <input 
                       type="text"
                       required
-                      placeholder="4242 •••• •••• 4242"
-                      defaultValue="4242 4242 4242 4242"
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
+                      defaultValue="4242 •••• •••• 4242"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none"
                     />
                   </div>
                 </div>
@@ -130,9 +160,8 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Expiry Date</label>
                     <input 
                       type="text"
-                      placeholder="08/28"
                       defaultValue="08/28"
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none"
                     />
                   </div>
 
@@ -140,39 +169,38 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
                     <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">CVC / CVV</label>
                     <input 
                       type="password"
-                      placeholder="123"
                       defaultValue="123"
-                      className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[#ECECF3] dark:border-[#26334D] bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-sm shadow-xl shadow-indigo-500/30 hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow flex items-center justify-center gap-2"
                 >
                   <Lock className="w-4 h-4" />
-                  <span>Lock ${deal.finalPrice} in Escrow Now</span>
+                  <span>Lock ${deal.finalPrice} in Escrow</span>
                 </button>
               </form>
             )}
 
             {processingState === 'processing' && (
               <div className="text-center py-12 space-y-4">
-                <RefreshCw className="w-10 h-10 text-indigo-500 animate-spin mx-auto" />
-                <h4 className="font-extrabold text-base text-slate-900 dark:text-white">Securing Funds in Escrow...</h4>
-                <p className="text-xs text-slate-500">Communicating with Stripe/Razorpay secure server.</p>
+                <RefreshCw className="w-8 h-8 text-[#6D5EF8] animate-spin mx-auto" />
+                <h4 className="font-bold text-base text-slate-900 dark:text-white">Securing Funds in Escrow...</h4>
+                <p className="text-xs text-slate-500">Processing encrypted transaction via Stripe Gateway.</p>
               </div>
             )}
 
             {processingState === 'success' && (
               <div className="text-center py-8 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 mx-auto flex items-center justify-center">
-                  <CheckCircle2 className="w-10 h-10" />
+                <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-500 mx-auto flex items-center justify-center">
+                  <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h4 className="font-black text-xl text-slate-900 dark:text-white">Payment Successful!</h4>
+                <h4 className="font-black text-xl text-slate-900 dark:text-white">Escrow Payment Confirmed!</h4>
                 <p className="text-xs text-slate-500">
-                  ${deal.finalPrice} is now securely locked in InfluenceConnect Escrow. Deal is ACTIVE!
+                  ${deal.finalPrice} is now securely locked in SocialLoop Escrow. Funds release upon content completion.
                 </p>
                 <button
                   onClick={onClose}
@@ -188,44 +216,44 @@ export const PaymentModal = ({ deal, isOpen, onClose }) => {
         {/* OFFLINE PAYMENT WORKFLOW */}
         {paymentOption === 'Offline' && (
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900/40 border space-y-3">
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Two-Way Offline Payment Verification</h4>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-[#ECECF3] dark:border-[#26334D] space-y-3">
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Two-Way Offline Verification</h4>
               <p className="text-slate-500">
-                Business marks payment done &rarr; Influencer confirms receipt &rarr; Deal completed.
+                Business marks payment sent &rarr; Influencer confirms receipt.
               </p>
 
-              <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-white/10">
+              <div className="space-y-2 pt-2 border-t border-[#ECECF3] dark:border-[#26334D]">
                 <div className="flex items-center justify-between">
-                  <span>1. Business Owner Payment:</span>
+                  <span>1. Business Owner Status:</span>
                   <button
                     onClick={handleOfflineBusinessClick}
                     className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
                       deal.offlineBusinessPaid 
                         ? 'bg-emerald-500 text-white' 
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        : 'bg-[#6D5EF8] text-white'
                     }`}
                   >
-                    {deal.offlineBusinessPaid ? '✓ Payment Done' : 'Click: Payment Done'}
+                    {deal.offlineBusinessPaid ? '✓ Payment Sent' : 'Mark Payment Sent'}
                   </button>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span>2. Influencer Receipt:</span>
+                  <span>2. Influencer Status:</span>
                   <button
                     onClick={handleOfflineInfluencerClick}
                     className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
                       deal.offlineInfluencerReceived 
                         ? 'bg-emerald-500 text-white' 
-                        : 'bg-rose-600 text-white hover:bg-rose-700'
+                        : 'bg-[#6D5EF8] text-white'
                     }`}
                   >
-                    {deal.offlineInfluencerReceived ? '✓ Payment Received' : 'Click: Payment Received'}
+                    {deal.offlineInfluencerReceived ? '✓ Payment Received' : 'Confirm Payment Received'}
                   </button>
                 </div>
               </div>
 
               {deal.offlineBusinessPaid && deal.offlineInfluencerReceived && (
-                <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-center">
+                <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-center">
                   🎉 Deal Status = COMPLETED
                 </div>
               )}

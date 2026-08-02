@@ -4,34 +4,34 @@
 
 @layer base {
   body {
-    @apply bg-[#faf9fe] text-slate-800 dark:bg-[#070913] dark:text-slate-100 transition-colors duration-300 font-sans antialiased overflow-x-hidden selection:bg-purple-500 selection:text-white;
+    @apply bg-[#FAFAFC] text-[#1F2937] dark:bg-[#0B0F17] dark:text-[#F3F4F6] transition-colors duration-200 font-sans antialiased overflow-x-hidden selection:bg-[#6D5EF8] selection:text-white;
   }
 }
 
-/* Premium Pastel Light & Dreamy Dark Glassmorphism */
+/* Modern Minimalist Glassmorphism & Flat Cards (No heavy gradients) */
 .glass-panel {
-  @apply bg-white/80 dark:bg-[#0f1424]/80 backdrop-blur-xl border border-purple-100/80 dark:border-purple-500/20 shadow-xl shadow-purple-500/5 dark:shadow-purple-950/40;
+  @apply bg-white/95 dark:bg-[#161E2E]/95 backdrop-blur-md border border-[#ECECF3] dark:border-[#26334D] shadow-sm;
 }
 
 .glass-card {
-  @apply bg-white/70 dark:bg-[#131a2e]/70 backdrop-blur-lg border border-purple-100 dark:border-purple-500/15 transition-all duration-300 hover:border-purple-400 dark:hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1;
+  @apply bg-white dark:bg-[#161E2E] backdrop-blur-md border border-[#ECECF3] dark:border-[#26334D] transition-all duration-200 hover:border-[#6D5EF8]/40 dark:hover:border-[#6D5EF8]/50 hover:shadow-md hover:-translate-y-0.5;
 }
 
 .glass-nav {
-  @apply bg-white/85 dark:bg-[#070913]/90 backdrop-blur-2xl border-b border-purple-100/70 dark:border-purple-500/20;
+  @apply bg-white/90 dark:bg-[#0B0F17]/90 backdrop-blur-md border-b border-[#ECECF3] dark:border-[#26334D];
 }
 
-/* Aesthetic Pastel & Dreamy Gradients */
+/* Flat Startup Brand Classes */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 dark:from-purple-400 dark:via-pink-400 dark:to-cyan-400;
+  @apply text-[#6D5EF8] dark:text-[#8B7CFF] font-semibold;
 }
 
 .gradient-bg {
-  @apply bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 text-white shadow-lg shadow-purple-500/20;
+  @apply bg-[#6D5EF8] text-white shadow-sm hover:bg-[#5847E0] transition-colors;
 }
 
 .gradient-button {
-  @apply bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-500/20 hover:scale-[1.02] transition-all duration-200;
+  @apply bg-[#6D5EF8] hover:bg-[#5847E0] text-white font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200;
 }
 
 /* Custom Scrollbar */
@@ -43,24 +43,24 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-purple-200 dark:bg-purple-900/60 rounded-full hover:bg-purple-500 transition-colors;
+  @apply bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-400 transition-colors;
 }
 
-/* Animations & Aurora Glows */
+/* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-4px); }
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 5s ease-in-out infinite;
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-aurora {
-  animation: pulse-slow 8s ease-in-out infinite;
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
 }

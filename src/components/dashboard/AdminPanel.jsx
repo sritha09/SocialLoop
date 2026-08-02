@@ -23,7 +23,7 @@ export const AdminPanel = () => {
           </span>
           <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-rose-500" />
-            <span>InfluenceConnect Admin Management</span>
+            <span>SocialLoop Admin Management</span>
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             System oversight for accounts, business verifications, payments, and platform integrity.

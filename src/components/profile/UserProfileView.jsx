@@ -81,7 +81,7 @@ export const UserProfileView = ({ userId, onChatClick }) => {
             <div>
               <h4 className="font-bold text-xs text-slate-400 uppercase tracking-wider mb-2">About & Vision</h4>
               <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed max-w-3xl">
-                {profileUser.description || profileUser.bio || 'Professional collaborator on InfluenceConnect platform.'}
+                {profileUser.description || profileUser.bio || 'Professional collaborator on SocialLoop platform.'}
               </p>
             </div>
 

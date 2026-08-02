@@ -51,7 +51,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
             </div>
           </div>
           <h3 className="text-2xl font-black text-slate-900 dark:text-white">
-            {mode === 'login' ? 'Welcome Back to InfluenceConnect' : 'Create Your Account'}
+            {mode === 'login' ? 'Welcome Back to SocialLoop' : 'Create Your Account'}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {mode === 'login' ? 'Enter your credentials or try instant demo login below' : 'Select your role to view tailored signup form'}

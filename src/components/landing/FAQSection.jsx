@@ -6,7 +6,7 @@ export const FAQSection = () => {
 
   const faqs = [
     {
-      q: 'How does escrow payment protection work on InfluenceConnect?',
+      q: 'How does escrow payment protection work on SocialLoop?',
       a: 'When a business owner accepts an influencer deal, funds are securely held in platform escrow (via Stripe/Razorpay or locked offline status). Once the creator publishes the content and the business approves, payment is instantly released.'
     },
     {

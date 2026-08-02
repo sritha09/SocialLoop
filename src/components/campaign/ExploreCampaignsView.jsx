@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, MapPin, Calendar, DollarSign, Users, SlidersHorizontal, Sparkles, ArrowRight } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Search, MapPin, DollarSign, SlidersHorizontal, Sparkles, Coffee, Dumbbell, Laptop, Sparkle, Tag } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { CampaignCard } from './CampaignCard';
 
@@ -8,19 +7,23 @@ export const ExploreCampaignsView = ({ openApplyModal, onChatClick, onViewDetail
   const { campaigns } = useData();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('All'); // 'All', 'Promotion', 'Collaboration'
+  const [selectedType, setSelectedType] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
-  const [selectedMode, setSelectedMode] = useState('All');
   const [paidOnly, setPaidOnly] = useState(false);
 
-  const categories = ['All', 'Cafe & Restaurant', 'Fashion & Fitness', 'Technology & Startups', 'Beauty & Skincare'];
+  const filterChips = [
+    { label: 'All Campaigns', icon: Sparkles, cat: 'All' },
+    { label: 'Cafes & Dining', icon: Coffee, cat: 'Cafe & Restaurant' },
+    { label: 'Fitness & Apparel', icon: Dumbbell, cat: 'Fashion & Fitness' },
+    { label: 'Tech & Startups', icon: Laptop, cat: 'Technology & Startups' },
+    { label: 'Beauty & Skincare', icon: Sparkle, cat: 'Beauty & Skincare' },
+  ];
 
   const filteredCampaigns = campaigns.filter(c => {
     if (selectedType !== 'All' && c.campaignType !== selectedType) return false;
     if (selectedCategory !== 'All' && c.businessCategory !== selectedCategory) return false;
     if (selectedCity !== 'All' && c.city !== selectedCity) return false;
-    if (selectedMode !== 'All' && c.mode !== selectedMode) return false;
     if (paidOnly && !c.isPaid) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -33,139 +36,98 @@ export const ExploreCampaignsView = ({ openApplyModal, onChatClick, onViewDetail
   });
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto">
       
-      {/* DISCOVERY PORTAL BANNER */}
-      <div className="p-8 rounded-3xl bg-slate-900 text-white relative overflow-hidden shadow-lg border border-slate-800">
-        <div className="max-w-2xl space-y-3 relative z-10">
-          <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-wider border border-amber-500/30">
-            Campaign Discovery Portal
-          </span>
-          <h2 className="text-3xl font-extrabold tracking-tight">
-            Explore Brand Opportunities & Collabs
-          </h2>
-          <p className="text-sm text-slate-300 leading-relaxed font-normal">
-            Discover verified promotional campaigns from top cafes, startups, and fitness brands. Pitch your creative rates and earn guaranteed escrow payouts.
-          </p>
-        </div>
-      </div>
+      {/* AIRBNB-STYLE HERO SEARCH HEADER */}
+      <div className="space-y-6 text-center max-w-3xl mx-auto pt-4">
+        <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+          Explore Active <span className="text-[#6D5EF8]">Brand Campaigns</span>
+        </h2>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-normal">
+          Discover vetted promotional deals from top cafes, startups, and fitness brands.
+        </p>
 
-      {/* SEARCH BAR & CATEGORY PILLS */}
-      <div className="space-y-4">
-        
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          
-          {/* SEARCH INPUT */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+        {/* AIRBNB-STYLE PROMINENT SEARCH BAR */}
+        <div className="glass-panel p-2 rounded-2xl shadow-md border border-[#ECECF3] dark:border-[#26334D] flex flex-col sm:flex-row items-center gap-2 max-w-2xl mx-auto">
+          <div className="flex-1 flex items-center gap-3 px-4 py-2 w-full">
+            <Search className="w-4 h-4 text-slate-400 shrink-0" />
             <input 
               type="text"
-              placeholder="Search by keyword, city, brand, or campaign title..."
+              placeholder="Search by city, brand, or campaign..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white text-xs font-medium outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-transparent text-xs font-semibold text-slate-900 dark:text-white outline-none placeholder:text-slate-400"
             />
           </div>
 
-          {/* CATEGORY PILLS */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-medium">
-            <span className="text-slate-400 font-bold pr-2 shrink-0">Category:</span>
-            {categories.map(cat => (
+          <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto px-2">
+            <select
+              value={selectedCity}
+              onChange={e => setSelectedCity(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs font-bold border-none outline-none cursor-pointer"
+            >
+              <option value="All">All Locations</option>
+              <option value="San Francisco">San Francisco</option>
+              <option value="New York">New York</option>
+              <option value="Austin">Austin</option>
+            </select>
+
+            <button
+              onClick={() => setPaidOnly(!paidOnly)}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1 shrink-0 ${
+                paidOnly
+                  ? 'bg-emerald-500 text-white shadow-sm'
+                  : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              <DollarSign className="w-3.5 h-3.5" />
+              <span>Paid</span>
+            </button>
+          </div>
+        </div>
+
+        {/* AIRBNB-STYLE FILTER CHIPS */}
+        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 text-xs font-semibold pt-2">
+          {filterChips.map((chip) => {
+            const Icon = chip.icon;
+            const isSelected = selectedCategory === chip.cat;
+            return (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold shadow-sm'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                key={chip.label}
+                onClick={() => setSelectedCategory(chip.cat)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all whitespace-nowrap border ${
+                  isSelected
+                    ? 'bg-[#6D5EF8] text-white border-[#6D5EF8] shadow-sm font-bold'
+                    : 'bg-white dark:bg-[#161E2E] text-slate-600 dark:text-slate-300 border-[#ECECF3] dark:border-[#26334D] hover:border-[#6D5EF8]'
                 }`}
               >
-                {cat}
+                <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-[#6D5EF8]'}`} />
+                <span>{chip.label}</span>
               </button>
-            ))}
-          </div>
-
-          {/* SECONDARY FILTERS ROW */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs font-medium">
-            
-            <div>
-              <label className="block text-[11px] text-slate-400 font-semibold mb-1">Opportunity Type</label>
-              <select
-                value={selectedType}
-                onChange={e => setSelectedType(e.target.value)}
-                className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none"
-              >
-                <option value="All">All Types</option>
-                <option value="Promotion">Promotion (One-Time)</option>
-                <option value="Collaboration">Collaboration (Long-Term)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] text-slate-400 font-semibold mb-1">Location / City</label>
-              <select
-                value={selectedCity}
-                onChange={e => setSelectedCity(e.target.value)}
-                className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none"
-              >
-                <option value="All">All Cities</option>
-                <option value="San Francisco">San Francisco</option>
-                <option value="New York">New York</option>
-                <option value="Austin">Austin</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] text-slate-400 font-semibold mb-1">Venue Mode</label>
-              <select
-                value={selectedMode}
-                onChange={e => setSelectedMode(e.target.value)}
-                className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white outline-none"
-              >
-                <option value="All">All Modes</option>
-                <option value="Offline">Offline (In-Person)</option>
-                <option value="Online">Online / Remote</option>
-                <option value="Hybrid">Hybrid</option>
-              </select>
-            </div>
-
-            <div className="pt-5">
-              <button
-                type="button"
-                onClick={() => setPaidOnly(!paidOnly)}
-                className={`w-full py-2 px-3 rounded-xl border font-bold flex items-center justify-center gap-1.5 transition-all ${
-                  paidOnly
-                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800'
-                }`}
-              >
-                <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Paid Campaigns Only</span>
-              </button>
-            </div>
-
-          </div>
-
+            );
+          })}
         </div>
 
       </div>
 
-      {/* CAMPAIGN GRID */}
+      {/* CAMPAIGN CARDS GRID */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold text-sm text-slate-900 dark:text-white">
-            Matching Campaigns ({filteredCampaigns.length})
+            Available Collaborations ({filteredCampaigns.length})
           </h3>
         </div>
 
         {filteredCampaigns.length === 0 ? (
-          <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-            <p className="text-xs text-slate-500">No active campaigns found matching your current filter criteria.</p>
+          <div className="p-12 text-center glass-panel rounded-2xl border border-[#ECECF3] dark:border-[#26334D] space-y-3">
+            <p className="text-xs text-slate-500">No campaigns match your selected search criteria.</p>
             <button
-              onClick={() => { setSelectedType('All'); setSelectedCategory('All'); setSelectedCity('All'); setSearchQuery(''); }}
-              className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold"
+              onClick={() => { setSelectedType('All'); setSelectedCategory('All'); setSelectedCity('All'); setSearchQuery(''); setPaidOnly(false); }}
+              className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white text-xs font-bold"
             >
-              Reset Filters
+              Reset All Filters
             </button>
           </div>
         ) : (

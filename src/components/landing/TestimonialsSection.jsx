@@ -8,7 +8,7 @@ export const TestimonialsSection = () => {
       role: 'Owner, Artisan Roast Cafe',
       location: 'San Francisco, CA',
       avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200',
-      text: 'InfluenceConnect made it effortless for our SF cafe to book 4 local food bloggers for our new cold brew launch. The escrow system gave us total peace of mind.',
+      text: 'SocialLoop made it effortless for our SF cafe to book 4 local food bloggers for our new cold brew launch. The escrow system gave us total peace of mind.',
       rating: 5,
       type: 'Business Owner'
     },
@@ -26,7 +26,7 @@ export const TestimonialsSection = () => {
       role: 'Founder, PulseFit Wear',
       location: 'New York, NY',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
-      text: 'Finding authentic micro-influencers with engaged fitness audiences used to take weeks of cold DMing. With InfluenceConnect, we signed 3 brand ambassadors in 48 hours!',
+      text: 'Finding authentic micro-influencers with engaged fitness audiences used to take weeks of cold DMing. With SocialLoop, we signed 3 brand ambassadors in 48 hours!',
       rating: 5,
       type: 'Business Owner'
     }
@@ -45,7 +45,7 @@ export const TestimonialsSection = () => {
             Loved By <span className="gradient-text">Brands & Creators</span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-base">
-            See how InfluenceConnect is powering meaningful collaborations across top cities.
+            See how SocialLoop is powering meaningful collaborations across top cities.
           </p>
         </div>
 

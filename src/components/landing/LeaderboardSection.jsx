@@ -16,7 +16,7 @@ export const LeaderboardSection = ({ setActiveView }) => {
             Top Creators & <span className="gradient-text">Trusted Businesses</span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-base">
-            Recognizing the top performing content creators and highest rated business partners on InfluenceConnect.
+            Recognizing the top performing content creators and highest rated business partners on SocialLoop.
           </p>
         </div>
 
