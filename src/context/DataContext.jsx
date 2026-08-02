@@ -1,61 +1,108 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import {
-  INITIAL_CAMPAIGNS,
-  INITIAL_APPLICATIONS,
-  INITIAL_DEALS,
-  INITIAL_MESSAGES,
-  INITIAL_NOTIFICATIONS,
-  INITIAL_REVIEWS,
-  INITIAL_POSTS
-} from '../mockData/initialData';
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [campaigns, setCampaigns] = useState(() => {
     const saved = localStorage.getItem('sl_campaigns');
-    return saved ? JSON.parse(saved) : INITIAL_CAMPAIGNS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(c => c && !['c1', 'c2', 'c3', 'c4'].includes(c.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [applications, setApplications] = useState(() => {
     const saved = localStorage.getItem('sl_applications');
-    return saved ? JSON.parse(saved) : INITIAL_APPLICATIONS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(a => a && !['app1', 'app2', 'app3'].includes(a.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [deals, setDeals] = useState(() => {
     const saved = localStorage.getItem('sl_deals');
-    return saved ? JSON.parse(saved) : INITIAL_DEALS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(d => d && !['d1', 'd2'].includes(d.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem('sl_messages');
-    return saved ? JSON.parse(saved) : INITIAL_MESSAGES;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(m => m && !['m1', 'm2', 'm3'].includes(m.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [notifications, setNotifications] = useState(() => {
     const saved = localStorage.getItem('sl_notifications');
-    return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(n => n && !['n1', 'n2'].includes(n.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [reviews, setReviews] = useState(() => {
     const saved = localStorage.getItem('sl_reviews');
-    return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(r => r && !['r1', 'r2'].includes(r.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [savedCampaigns, setSavedCampaigns] = useState(() => {
     const saved = localStorage.getItem('sl_saved_campaigns');
-    return saved ? JSON.parse(saved) : ['c1'];
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [posts, setPosts] = useState(() => {
     const saved = localStorage.getItem('sl_posts');
-    return saved ? JSON.parse(saved) : INITIAL_POSTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.filter(p => p && !['p1', 'p2', 'p3'].includes(p.id) && !['b1', 'b2', 'i1', 'i2'].includes(p.authorId));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [followingMap, setFollowingMap] = useState(() => {
     const saved = localStorage.getItem('sl_following');
-    return saved ? JSON.parse(saved) : { i1: ['b1', 'b2'], b1: ['i1'] };
+    return saved ? JSON.parse(saved) : {};
   });
 
   // Sync to LocalStorage

@@ -5,20 +5,30 @@ import { X } from 'lucide-react';
 export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
   useEffect(() => {
     if (isOpen) {
+      const prevBodyOverflow = document.body.style.overflow;
+      const prevHtmlOverflow = document.documentElement.style.overflow;
+
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'hidden';
+
+      return () => {
+        document.body.style.overflow = prevBodyOverflow || '';
+        document.documentElement.style.overflow = prevHtmlOverflow || '';
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-hidden animate-fadeIn select-none">
-      <div className={`relative w-full ${maxWidth} glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] max-h-[85vh] overflow-y-auto my-auto`}>
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn select-none"
+    >
+      <div 
+        onClick={e => e.stopPropagation()}
+        className={`relative w-full ${maxWidth} glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] max-h-[85vh] overflow-y-auto my-auto cursor-default`}
+      >
         <button
           onClick={onClose}
           className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors z-20"

@@ -5,14 +5,28 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState(() => {
     const saved = localStorage.getItem('sl_users');
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Automatically filter out any stale demo users
+        return parsed.filter(u => u && !['b1', 'b2', 'b3', 'i1', 'i2', 'i3', 'b4', 'i4'].includes(u.id));
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('sl_current_user');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed && ['b1', 'b2', 'b3', 'i1', 'i2', 'i3', 'b4', 'i4'].includes(parsed.id)) {
+          localStorage.removeItem('sl_current_user');
+          return null;
+        }
+        return parsed;
       } catch (e) {
         return null;
       }
@@ -33,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   }, [currentUser]);
 
   const login = (email, password) => {
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = users.find(u => u.email?.toLowerCase() === email?.toLowerCase());
     if (user) {
       setCurrentUser(user);
       return { success: true, user };
