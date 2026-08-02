@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Camera, User, Mail, Phone, Lock, Star, ArrowRight } from 'lucide-react';
-import { InstagramIcon, YoutubeIcon, TwitterIcon, LinkedinIcon } from '../common/Icons';
+import { Camera, User, Mail, Phone, Lock, ArrowRight } from 'lucide-react';
+import { InstagramIcon, YoutubeIcon } from '../common/Icons';
 import { useAuth } from '../../context/AuthContext';
 
 export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
@@ -15,17 +15,14 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
     password: '',
     age: 24,
     gender: 'Female',
-    state: 'California',
-    city: 'San Francisco',
+    state: '',
+    city: '',
     languages: ['English'],
     category: 'Food & Lifestyle',
     instagram: '',
     youtube: '',
     twitter: '',
     linkedin: '',
-    followersCount: 50000,
-    avgReach: 20000,
-    engagementRate: 5.2,
     bio: '',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
     coverImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1200'
@@ -33,6 +30,8 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.instagram.trim()) return;
+
     signup(formData);
     if (onSuccess) onSuccess();
     if (onClose) onClose();
@@ -52,7 +51,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
               placeholder="e.g. Alex Rivera" 
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
         </div>
@@ -67,7 +66,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
               placeholder="@alexvlogs" 
               value={formData.username}
               onChange={e => setFormData({ ...formData, username: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
         </div>
@@ -82,7 +81,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
               placeholder="alex@creator.com" 
               value={formData.email}
               onChange={e => setFormData({ ...formData, email: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
         </div>
@@ -94,10 +93,10 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
             <input 
               type="tel" 
               required
-              placeholder="+1 (555) 123-4567" 
+              placeholder="+91 98765 43210" 
               value={formData.phone}
               onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
         </div>
@@ -112,7 +111,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
               placeholder="••••••••" 
               value={formData.password}
               onChange={e => setFormData({ ...formData, password: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
         </div>
@@ -122,7 +121,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
           <select
             value={formData.category}
             onChange={e => setFormData({ ...formData, category: e.target.value })}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
           >
             <option value="Food & Lifestyle">Food & Lifestyle</option>
             <option value="Fitness & Health">Fitness & Health</option>
@@ -138,10 +137,10 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
           <input 
             type="text" 
             required
-            placeholder="e.g. California" 
+            placeholder="e.g. Telangana" 
             value={formData.state}
             onChange={e => setFormData({ ...formData, state: e.target.value })}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
           />
         </div>
 
@@ -150,56 +149,35 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
           <input 
             type="text" 
             required
-            placeholder="e.g. San Francisco" 
+            placeholder="e.g. Hyderabad" 
             value={formData.city}
             onChange={e => setFormData({ ...formData, city: e.target.value })}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
           />
         </div>
 
-        <div>
-          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Total Followers Count *</label>
-          <input 
-            type="number" 
-            required
-            placeholder="85000" 
-            value={formData.followersCount}
-            onChange={e => setFormData({ ...formData, followersCount: Number(e.target.value) })}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Engagement Rate (%) *</label>
-          <input 
-            type="number" 
-            step="0.1"
-            required
-            placeholder="5.4" 
-            value={formData.engagementRate}
-            onChange={e => setFormData({ ...formData, engagementRate: Number(e.target.value) })}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Instagram Link</label>
+        {/* MANDATORY INSTAGRAM HANDLE FIELD */}
+        <div className="sm:col-span-2">
+          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Instagram Handle / Link * <span className="text-rose-500 text-xs font-normal">(Required)</span>
+          </label>
           <div className="relative">
-            <div className="w-4 h-4 text-slate-400 absolute left-3 top-3">
+            <div className="w-4 h-4 text-rose-500 absolute left-3 top-3">
               <InstagramIcon className="w-4 h-4" />
             </div>
             <input 
-              type="url" 
-              placeholder="https://instagram.com/yourhandle" 
+              type="text" 
+              required
+              placeholder="e.g. @alexcreates or https://instagram.com/alexcreates" 
               value={formData.instagram}
               onChange={e => setFormData({ ...formData, instagram: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none font-medium"
             />
           </div>
         </div>
 
-        <div>
-          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">YouTube Channel Link</label>
+        <div className="sm:col-span-2">
+          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">YouTube Channel Link (Optional)</label>
           <div className="relative">
             <div className="w-4 h-4 text-slate-400 absolute left-3 top-3">
               <YoutubeIcon className="w-4 h-4" />
@@ -209,7 +187,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
               placeholder="https://youtube.com/c/channel" 
               value={formData.youtube}
               onChange={e => setFormData({ ...formData, youtube: e.target.value })}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
             />
           </div>
         </div>
@@ -218,22 +196,11 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
           <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Creator Bio</label>
           <textarea 
             rows="3"
-            placeholder="Share your creator vision, target audience demographics, past brand achievements, and vibe..."
+            placeholder="Share your creator vision, target audience, and niche..."
             value={formData.bio}
             onChange={e => setFormData({ ...formData, bio: e.target.value })}
-            className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none"
+            className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#6D5EF8] outline-none"
           ></textarea>
-        </div>
-
-        <div className="sm:col-span-2">
-          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Profile Avatar URL</label>
-          <input 
-            type="url" 
-            placeholder="https://images.unsplash.com/..." 
-            value={formData.avatar}
-            onChange={e => setFormData({ ...formData, avatar: e.target.value })}
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none text-xs"
-          />
         </div>
 
       </div>
@@ -241,7 +208,7 @@ export const InfluencerSignupForm = ({ onSuccess, onClose }) => {
       <div className="pt-4">
         <button
           type="submit"
-          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 text-white font-bold text-sm shadow-xl shadow-rose-500/30 hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow-xl hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
         >
           <span>Complete Creator Registration</span>
           <ArrowRight className="w-4 h-4" />
