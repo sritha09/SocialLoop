@@ -27,12 +27,24 @@ export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
 
+      // 6. Escape key handler
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+          e.preventDefault();
+          if (onClose) onClose();
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
       return () => {
-        // 6. Restore original body inline styles
+        window.removeEventListener('keydown', handleKeyDown);
+
+        // 7. Restore original body inline styles
         document.body.style.overflow = originalOverflow || '';
         document.body.style.paddingRight = originalPaddingRight || '';
 
-        // 7. Safely restore focus without triggering browser auto-scroll
+        // 8. Safely restore focus without triggering browser auto-scroll
         if (previouslyFocusedElement && typeof previouslyFocusedElement.focus === 'function') {
           try {
             previouslyFocusedElement.focus({ preventScroll: true });
@@ -41,7 +53,7 @@ export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
           }
         }
 
-        // 8. Defer scroll position restoration to next frame after layout reflow
+        // 9. Defer scroll position restoration to next frame after layout reflow
         requestAnimationFrame(() => {
           window.scrollTo({
             top: scrollYRef.current,
@@ -51,7 +63,7 @@ export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
         });
       };
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -65,6 +77,7 @@ export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
         className={`relative w-full ${maxWidth} glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-[#ECECF3] dark:border-[#26334D] max-h-[85vh] overflow-y-auto my-auto cursor-default`}
       >
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors z-20"
         >

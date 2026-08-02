@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Briefcase, Camera, LogIn, UserCheck, Shield } from 'lucide-react';
+import { Sparkles, Briefcase, Camera, LogIn } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BusinessSignupForm } from './BusinessSignupForm';
 import { InfluencerSignupForm } from './InfluencerSignupForm';
 
 import { Modal } from '../common/Modal';
 
-export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'business' }) => {
+export const AuthModal = ({ isOpen, onClose, onSuccess, initialMode = 'login', initialRole = 'business' }) => {
   const [mode, setMode] = useState(initialMode); // 'login' or 'signup'
   const [role, setRole] = useState(initialRole); // 'business' or 'influencer'
   
@@ -20,10 +20,16 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
     e.preventDefault();
     const res = login(loginEmail, loginPassword);
     if (res.success) {
-      onClose();
+      if (onSuccess) onSuccess();
+      else onClose();
     } else {
       setErrorMsg(res.message);
     }
+  };
+
+  const handleSignupSuccess = () => {
+    if (onSuccess) onSuccess();
+    else onClose();
   };
 
   return (
@@ -40,13 +46,14 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
             {mode === 'login' ? 'Welcome Back to SocialLoop' : 'Create Your Account'}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            {mode === 'login' ? 'Enter your credentials or try instant demo login below' : 'Select your role to view tailored signup form'}
+            {mode === 'login' ? 'Enter your credentials to log in' : 'Select your role to view tailored signup form'}
           </p>
         </div>
 
         {/* MODE TOGGLE (LOGIN / SIGNUP) */}
         <div className="flex bg-slate-100 dark:bg-slate-800/60 p-1 rounded-2xl mb-6 border border-slate-200 dark:border-white/10">
           <button
+            type="button"
             onClick={() => { setMode('login'); setErrorMsg(''); }}
             className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
               mode === 'login'
@@ -57,6 +64,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
             Log In
           </button>
           <button
+            type="button"
             onClick={() => { setMode('signup'); setErrorMsg(''); }}
             className={`flex-1 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
               mode === 'signup'
@@ -83,7 +91,7 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                 <input 
                   type="email" 
                   required
-                  placeholder="elena@artisanroast.com" 
+                  placeholder="your.name@example.com" 
                   value={loginEmail}
                   onChange={e => setLoginEmail(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs sm:text-sm outline-none focus:ring-2 focus:ring-indigo-500"
@@ -153,9 +161,9 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
             {/* TAILORED FORM BASED ON ROLE */}
             {role === 'business' ? (
-              <BusinessSignupForm onSuccess={onClose} onClose={onClose} />
+              <BusinessSignupForm onSuccess={handleSignupSuccess} onClose={onClose} />
             ) : (
-              <InfluencerSignupForm onSuccess={onClose} onClose={onClose} />
+              <InfluencerSignupForm onSuccess={handleSignupSuccess} onClose={onClose} />
             )}
 
           </div>

@@ -235,7 +235,8 @@ const MainAppContent = () => {
       {/* MODALS */}
       <AuthModal 
         isOpen={isAuthOpen}
-        onClose={handleAuthSuccess}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={handleAuthSuccess}
         initialMode={authInitialMode}
       />
 

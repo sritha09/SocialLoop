@@ -37,6 +37,12 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
   const navigateSection = (sectionId) => {
     setActiveView('landing');
     setIsMobileMenuOpen(false);
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 50);
   };
 
   return (
