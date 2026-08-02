@@ -5,10 +5,13 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { useCurrency } from '../../context/CurrencyContext';
+import { EmptyState } from '../common/EmptyState';
 
 export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick, onViewDetailClick }) => {
   const { currentUser, users } = useAuth();
   const { campaigns, applications, deals } = useData();
+  const { formatCurrency } = useCurrency();
 
   const myApps = applications.filter(a => a.influencerId === currentUser?.id);
   const myDeals = deals.filter(d => d.influencerId === currentUser?.id);
@@ -58,7 +61,7 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
         </div>
       </div>
 
-      {/* LARGE STATISTICS CARDS GRID */}
+      {/* STATISTICS CARDS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <div className="glass-card p-5 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm">
@@ -66,7 +69,7 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
             <span>Creator Earnings</span>
             <DollarSign className="w-4 h-4 text-emerald-500" />
           </div>
-          <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">${totalEarnings}</p>
+          <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{formatCurrency(totalEarnings)}</p>
           <span className="text-xs text-emerald-500 font-bold mt-2 inline-block">100% Escrow Secured</span>
         </div>
 
@@ -120,9 +123,13 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
             </div>
 
             {myApps.length === 0 ? (
-              <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs text-slate-500">
-                You haven't submitted any campaign proposals yet. Explore active opportunities to apply!
-              </div>
+              <EmptyState 
+                icon={Send}
+                title="No proposals submitted yet"
+                description="Explore active brand campaigns and submit your first collaboration proposal!"
+                actionLabel="Explore Active Campaigns"
+                onAction={() => setActiveView('explore')}
+              />
             ) : (
               <div className="space-y-3">
                 {myApps.map((app) => {
@@ -133,7 +140,7 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
                     <div key={app.id} className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-900/40 border border-[#ECECF3] dark:border-[#26334D] flex items-center justify-between text-xs">
                       <div>
                         <h4 className="font-bold text-slate-900 dark:text-white text-xs">{campaign.title}</h4>
-                        <p className="text-slate-500 text-[11px] mt-0.5">{business.name} • Quote: <strong className="text-emerald-600 dark:text-emerald-400">${app.expectedPrice}</strong></p>
+                        <p className="text-slate-500 text-[11px] mt-0.5">{business.name} • Quote: <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(app.expectedPrice)}</strong></p>
                       </div>
 
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
@@ -158,9 +165,11 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
             </div>
 
             {myDeals.length === 0 ? (
-              <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs text-slate-500">
-                No active contracts at the moment.
-              </div>
+              <EmptyState 
+                icon={Handshake}
+                title="No active contracts"
+                description="Once a business accepts your application, your active deal contract will appear here."
+              />
             ) : (
               <div className="space-y-3">
                 {myDeals.map((deal) => {
@@ -172,7 +181,7 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
                         <img src={business.avatar || business.logo} alt={business.name} className="w-9 h-9 rounded-xl object-cover" />
                         <div>
                           <h4 className="font-bold text-slate-900 dark:text-white">{business.name}</h4>
-                          <p className="text-[11px] text-slate-400">Escrow Payout: <strong className="text-emerald-600 dark:text-emerald-400">${deal.finalPrice}</strong> • Deadline: {deal.deadline}</p>
+                          <p className="text-[11px] text-slate-400">Escrow Payout: <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(deal.finalPrice)}</strong> • Deadline: {deal.deadline}</p>
                         </div>
                       </div>
 
@@ -192,7 +201,7 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
 
         </div>
 
-        {/* PERSONALIZED AI CAMPAIGN RECOMMENDATIONS (RIGHT 5 COLUMNS) */}
+        {/* AI CAMPAIGN RECOMMENDATIONS (RIGHT 5 COLUMNS) */}
         <div className="lg:col-span-5 space-y-6">
           <div className="glass-panel p-6 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm space-y-4">
             
@@ -221,7 +230,7 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/50 text-[#6D5EF8] dark:text-[#8B7CFF]">
                       {camp.campaignType}
                     </span>
-                    <span className="font-black text-emerald-600 dark:text-emerald-400 text-xs">${camp.budget}</span>
+                    <span className="font-black text-emerald-600 dark:text-emerald-400 text-xs">{formatCurrency(camp.budget)}</span>
                   </div>
 
                   <h4 className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#6D5EF8] transition-colors line-clamp-1">

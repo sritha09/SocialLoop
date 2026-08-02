@@ -124,36 +124,6 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
                 <span>Log In To Account</span>
               </button>
             </form>
-
-            {/* QUICK 1-CLICK DEMO LOGIN BUTTONS */}
-            <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-              <p className="text-center text-xs font-bold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
-                ⚡ Instant 1-Click Demo Accounts
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <button
-                  onClick={() => handleDemoLogin('b1')}
-                  className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-white/5 hover:border-indigo-500 transition-all text-left group"
-                >
-                  <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=100" alt="Artisan" className="w-9 h-9 rounded-xl object-cover" />
-                  <div>
-                    <p className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-indigo-500">Artisan Roast Cafe</p>
-                    <p className="text-[11px] text-slate-500">Business Owner Role</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleDemoLogin('i1')}
-                  className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-white/5 hover:border-rose-500 transition-all text-left group"
-                >
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" alt="Maya" className="w-9 h-9 rounded-full object-cover" />
-                  <div>
-                    <p className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-rose-500">Maya Lin (@mayacreates)</p>
-                    <p className="text-[11px] text-slate-500">Influencer Role</p>
-                  </div>
-                </button>
-              </div>
-            </div>
           </div>
         )}
 

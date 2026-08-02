@@ -175,22 +175,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
               <span>{currentCurrency.code}</span>
             </button>
 
-            {/* DEMO ROLE SWITCHER */}
-            <div className="hidden lg:flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-800">
-              <span className="px-2 text-slate-400">Role:</span>
-              <button 
-                onClick={() => handleRoleSwitch('b1')} 
-                className={`px-2.5 py-1 rounded-lg transition-all ${currentUser?.id === 'b1' ? 'bg-[#6D5EF8] text-white font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'}`}
-              >
-                Business
-              </button>
-              <button 
-                onClick={() => handleRoleSwitch('i1')} 
-                className={`px-2.5 py-1 rounded-lg transition-all ${currentUser?.id === 'i1' ? 'bg-[#6D5EF8] text-white font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'}`}
-              >
-                Creator
-              </button>
-            </div>
+
 
             {/* THEME TOGGLE */}
             <button

@@ -1,14 +1,17 @@
 import React from 'react';
 import { 
   Users, Handshake, DollarSign, ArrowUpRight, PlusCircle, 
-  TrendingUp, ShieldCheck, MessageSquare, FileText, Zap, Compass
+  TrendingUp, ShieldCheck, MessageSquare, FileText, Zap, Compass, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { useCurrency } from '../../context/CurrencyContext';
+import { EmptyState } from '../common/EmptyState';
 
 export const BusinessDashboard = ({ setActiveView, openCreateCampaignModal, onChatClick, openPaymentModal, openInvoiceModal }) => {
   const { currentUser, users } = useAuth();
   const { campaigns, applications, deals } = useData();
+  const { formatCurrency } = useCurrency();
 
   const myCampaigns = campaigns.filter(c => c.businessId === currentUser?.id);
   const myCampaignIds = myCampaigns.map(c => c.id);
@@ -57,7 +60,7 @@ export const BusinessDashboard = ({ setActiveView, openCreateCampaignModal, onCh
         </div>
       </div>
 
-      {/* LARGE STATISTICS CARDS GRID */}
+      {/* STATISTICS CARDS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <div className="glass-card p-5 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm">
@@ -98,7 +101,7 @@ export const BusinessDashboard = ({ setActiveView, openCreateCampaignModal, onCh
             <span>Escrow Capital</span>
             <DollarSign className="w-4 h-4 text-emerald-500" />
           </div>
-          <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">${totalSpent}</p>
+          <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{formatCurrency(totalSpent)}</p>
           <span className="text-xs text-emerald-500 font-bold mt-2 inline-block">
             100% Protected
           </span>
@@ -106,7 +109,7 @@ export const BusinessDashboard = ({ setActiveView, openCreateCampaignModal, onCh
 
       </div>
 
-      {/* UPCOMING COLLABORATIONS & RECENT ACTIVITY */}
+      {/* COLLABORATIONS & RECENT ACTIVITY */}
       <div className="glass-panel p-6 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-[#ECECF3] dark:border-[#26334D]">
           <div>
@@ -126,9 +129,13 @@ export const BusinessDashboard = ({ setActiveView, openCreateCampaignModal, onCh
         </div>
 
         {myDeals.length === 0 ? (
-          <div className="text-center py-8 bg-slate-50 dark:bg-slate-900/40 rounded-xl text-xs text-slate-500">
-            No active deals yet. Screen and accept an applicant proposal to create a deal.
-          </div>
+          <EmptyState 
+            icon={Handshake}
+            title="No collaborations yet"
+            description="You don't have any active creator deals. Create a campaign or start exploring creators to initiate partnerships."
+            actionLabel="Create Your First Campaign"
+            onAction={openCreateCampaignModal}
+          />
         ) : (
           <div className="space-y-3">
             {myDeals.map((deal) => {
@@ -153,7 +160,7 @@ export const BusinessDashboard = ({ setActiveView, openCreateCampaignModal, onCh
                     <div>
                       <h4 className="font-bold text-slate-900 dark:text-white text-xs">{influencer.name} ({influencer.username})</h4>
                       <p className="text-slate-500 text-[11px]">{campaign.title}</p>
-                      <p className="text-[11px] text-slate-400">Payout Offer: <strong className="text-emerald-600 dark:text-emerald-400">${deal.finalPrice}</strong> • Deadline: {deal.deadline}</p>
+                      <p className="text-[11px] text-slate-400">Payout Offer: <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(deal.finalPrice)}</strong> • Deadline: {deal.deadline}</p>
                     </div>
                   </div>
 

@@ -38,6 +38,8 @@ import { InvoiceModal } from './components/deal/InvoiceModal';
 import { QRCodeModal } from './components/common/QRCodeModal';
 import { AIChatbot } from './components/ai/AIChatbot';
 
+import { BottomNav } from './components/layout/BottomNav';
+
 const MainAppContent = () => {
   const { currentUser, isBusiness, logout } = useAuth();
   
@@ -99,7 +101,7 @@ const MainAppContent = () => {
       />
 
       {/* DYNAMIC VIEW ROUTER */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
         
         {/* LOGGED-OUT USERS: PUBLIC LANDING PAGE */}
         {!currentUser && activeView === 'landing' && (
@@ -217,6 +219,15 @@ const MainAppContent = () => {
 
       {/* FOOTER */}
       <Footer setActiveView={setActiveView} openLegalModal={(type) => setLegalModalType(type)} />
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      {currentUser && (
+        <BottomNav 
+          activeView={activeView}
+          setActiveView={setActiveView}
+          openCreateCampaignModal={() => setIsCreateCampOpen(true)}
+        />
+      )}
 
       {/* FLOATING AI COPILOT BOT */}
       <AIChatbot />
