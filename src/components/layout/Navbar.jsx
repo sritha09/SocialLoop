@@ -10,8 +10,8 @@ import { useData } from '../../context/DataContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { SocialLoopLogo } from '../common/SocialLoopLogo';
 
-export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsModal, onLogoutClick, openLegalModal }) => {
-  const { currentUser, isBusiness, switchDemoUser } = useAuth();
+export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsModal, onLogoutClick, openLegalModal, onOpenChat, onViewProfile }) => {
+  const { currentUser } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { currentCurrency } = useCurrency();
   const { notifications, markNotificationAsRead } = useData();
@@ -29,11 +29,6 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
     setIsMobileMenuOpen(false);
   };
 
-  const handleRoleSwitch = (userId) => {
-    switchDemoUser(userId);
-    setActiveView('feed');
-  };
-
   const navigateSection = (sectionId) => {
     setActiveView('landing');
     setIsMobileMenuOpen(false);
@@ -45,13 +40,30 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
     }, 50);
   };
 
+  const handleNotifClick = (n) => {
+    markNotificationAsRead(n.id);
+    setIsNotifOpen(false);
+    
+    if (n.type === 'message' || n.senderId) {
+      if (onOpenChat) onOpenChat(n.senderId);
+      else setActiveView('chat');
+    } else if (n.type === 'follow' && n.senderId) {
+      if (onViewProfile) onViewProfile(n.senderId);
+      else setActiveView('profile');
+    } else if (n.type === 'campaign' || n.type === 'deal' || n.type === 'application') {
+      setActiveView('campaign-manage');
+    } else {
+      setActiveView('feed');
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 glass-nav transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
           {/* BRAND LOGO */}
-          <div onClick={() => handleNavClick(currentUser ? 'feed' : 'landing')}>
+          <div onClick={() => handleNavClick(currentUser ? 'feed' : 'landing')} className="cursor-pointer">
             <SocialLoopLogo />
           </div>
 
@@ -163,8 +175,6 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
               <span>{currentCurrency.code}</span>
             </button>
 
-
-
             {/* THEME TOGGLE */}
             <button
               onClick={toggleTheme}
@@ -191,7 +201,7 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
                     )}
                   </button>
 
-                  {/* NOTIFICATION DROPDOWN */}
+                  {/* INTERACTIVE NOTIFICATION DROPDOWN */}
                   {isNotifOpen && (
                     <div className="absolute right-0 mt-3 w-80 rounded-2xl glass-panel p-4 shadow-xl z-50 animate-fadeIn">
                       <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -205,11 +215,11 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
                           notifications.filter(n => n.userId === currentUser.id).map(n => (
                             <div 
                               key={n.id}
-                              onClick={() => markNotificationAsRead(n.id)}
+                              onClick={() => handleNotifClick(n)}
                               className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                                 n.isRead 
                                   ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-75' 
-                                  : 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800'
+                                  : 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 font-semibold'
                               }`}
                             >
                               <div className="font-semibold text-slate-900 dark:text-white flex items-center justify-between">
@@ -312,34 +322,9 @@ export const Navbar = ({ activeView, setActiveView, openAuthModal, openSettingsM
             </button>
 
           </div>
+
         </div>
       </div>
-
-      {/* MOBILE MENU DROPDOWN */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden glass-panel px-4 py-6 border-b space-y-3 text-sm font-semibold animate-fadeIn">
-          {!currentUser ? (
-            <>
-              <button onClick={() => handleNavClick('landing')} className="block w-full text-left py-2 font-bold text-[#6D5EF8]">Home</button>
-              <button onClick={() => navigateSection('features')} className="block w-full text-left py-2">Features</button>
-              <button onClick={() => navigateSection('how-it-works')} className="block w-full text-left py-2">How It Works</button>
-              <button onClick={() => openLegalModal('about')} className="block w-full text-left py-2">About</button>
-            </>
-          ) : (
-            <>
-              <button onClick={() => handleNavClick('feed')} className="block w-full text-left py-2 font-bold text-[#6D5EF8]">Home Feed</button>
-              <button onClick={() => handleNavClick('dashboard')} className="block w-full text-left py-2 font-bold">Dashboard</button>
-              <button onClick={() => handleNavClick('explore')} className="block w-full text-left py-2">Explore</button>
-              <button onClick={() => handleNavClick('chat')} className="block w-full text-left py-2">Messages</button>
-              <button onClick={() => handleNavClick('campaign-manage')} className="block w-full text-left py-2">Deals</button>
-              <button onClick={() => handleNavClick('transactions')} className="block w-full text-left py-2">Payments</button>
-              <button onClick={() => handleNavClick('profile')} className="block w-full text-left py-2">Profile</button>
-              <button onClick={openSettingsModal} className="block w-full text-left py-2 text-[#6D5EF8]">Settings ({currentCurrency.code})</button>
-              <button onClick={onLogoutClick} className="block w-full text-left py-2 text-rose-500">Log Out</button>
-            </>
-          )}
-        </div>
-      )}
     </header>
   );
 };

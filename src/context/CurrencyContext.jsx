@@ -4,14 +4,14 @@ const CurrencyContext = createContext();
 
 export const CURRENCIES = {
   USD: { code: 'USD', symbol: '$', rate: 1.0, label: 'US Dollar ($ USD)', flag: '🇺🇸' },
-  INR: { code: 'INR', symbol: '₹', rate: 83.0, label: 'Indian Rupee (₹ INR)', flag: '🇮🇳' },
-  GBP: { code: 'GBP', symbol: '£', rate: 0.78, label: 'British Pound (£ GBP)', flag: '🇬🇧' },
-  EUR: { code: 'EUR', symbol: '€', rate: 0.91, label: 'Euro (€ EUR)', flag: '🇪🇺' },
-  JPY: { code: 'JPY', symbol: '¥', rate: 152.0, label: 'Japanese Yen (¥ JPY)', flag: '🇯🇵' },
-  AUD: { code: 'AUD', symbol: 'A$', rate: 1.52, label: 'Australian Dollar (A$ AUD)', flag: '🇦🇺' },
-  CAD: { code: 'CAD', symbol: 'C$', rate: 1.36, label: 'Canadian Dollar (C$ CAD)', flag: '🇨🇦' },
-  SGD: { code: 'SGD', symbol: 'S$', rate: 1.34, label: 'Singapore Dollar (S$ SGD)', flag: '🇸🇬' },
-  AED: { code: 'AED', symbol: 'AED', rate: 3.67, label: 'UAE Dirham (AED)', flag: '🇦🇪' },
+  INR: { code: 'INR', symbol: '₹', rate: 1.0, label: 'Indian Rupee (₹ INR)', flag: '🇮🇳' },
+  GBP: { code: 'GBP', symbol: '£', rate: 1.0, label: 'British Pound (£ GBP)', flag: '🇬🇧' },
+  EUR: { code: 'EUR', symbol: '€', rate: 1.0, label: 'Euro (€ EUR)', flag: '🇪🇺' },
+  JPY: { code: 'JPY', symbol: '¥', rate: 1.0, label: 'Japanese Yen (¥ JPY)', flag: '🇯🇵' },
+  AUD: { code: 'AUD', symbol: 'A$', rate: 1.0, label: 'Australian Dollar (A$ AUD)', flag: '🇦🇺' },
+  CAD: { code: 'CAD', symbol: 'C$', rate: 1.0, label: 'Canadian Dollar (C$ CAD)', flag: '🇨🇦' },
+  SGD: { code: 'SGD', symbol: 'S$', rate: 1.0, label: 'Singapore Dollar (S$ SGD)', flag: '🇸🇬' },
+  AED: { code: 'AED', symbol: 'AED', rate: 1.0, label: 'UAE Dirham (AED)', flag: '🇦🇪' },
 };
 
 export const CurrencyProvider = ({ children }) => {
@@ -19,7 +19,6 @@ export const CurrencyProvider = ({ children }) => {
     const saved = localStorage.getItem('sl_currency');
     if (saved && CURRENCIES[saved]) return saved;
 
-    // Auto location detection based on Intl timezone
     try {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (tz.includes('Calcutta') || tz.includes('Kolkata') || tz.includes('India')) return 'INR';
@@ -33,19 +32,20 @@ export const CurrencyProvider = ({ children }) => {
     } catch (e) {
       // Fallback
     }
-    return 'USD';
+    return 'INR';
   });
 
   useEffect(() => {
     localStorage.setItem('sl_currency', currencyCode);
   }, [currencyCode]);
 
-  const currentCurrency = CURRENCIES[currencyCode] || CURRENCIES.USD;
+  const currentCurrency = CURRENCIES[currencyCode] || CURRENCIES.INR;
 
-  const formatCurrency = (amountInUSD) => {
-    if (amountInUSD === undefined || amountInUSD === null || isNaN(amountInUSD)) return `${currentCurrency.symbol}0`;
-    const converted = Math.round(Number(amountInUSD) * currentCurrency.rate);
-    return `${currentCurrency.symbol}${converted.toLocaleString()}`;
+  // Format currency directly with user's selected symbol without double-multiplying exchange rate
+  const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null || isNaN(amount)) return `${currentCurrency.symbol}0`;
+    const num = Math.round(Number(amount));
+    return `${currentCurrency.symbol}${num.toLocaleString()}`;
   };
 
   return (

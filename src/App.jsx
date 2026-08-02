@@ -4,9 +4,12 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 
+// COMPONENTS
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { BottomNav } from './components/layout/BottomNav';
 
+// LANDING SECTIONS
 import { HeroSection } from './components/landing/HeroSection';
 import { StatsSection } from './components/landing/StatsSection';
 import { FeaturesSection } from './components/landing/FeaturesSection';
@@ -15,48 +18,47 @@ import { LeaderboardSection } from './components/landing/LeaderboardSection';
 import { TestimonialsSection } from './components/landing/TestimonialsSection';
 import { FAQSection } from './components/landing/FAQSection';
 
+// CORE PLATFORM VIEWS
 import { HomeFeed } from './components/feed/HomeFeed';
 import { BusinessDashboard } from './components/dashboard/BusinessDashboard';
 import { InfluencerDashboard } from './components/dashboard/InfluencerDashboard';
 import { ExploreCampaignsView } from './components/campaign/ExploreCampaignsView';
+import { ChatWindow } from './components/chat/ChatWindow';
+import { CampaignManagement } from './components/campaign/CampaignManagement';
 import { TransactionsView } from './components/transactions/TransactionsView';
+import { UserProfileView } from './components/profile/UserProfileView';
 import { AnalyticsView } from './components/dashboard/AnalyticsView';
-import { AdminPanel } from './components/dashboard/AdminPanel';
 
+// MODALS
 import { AuthModal } from './components/auth/AuthModal';
 import { CreateCampaignModal } from './components/campaign/CreateCampaignModal';
 import { CreatePostModal } from './components/feed/CreatePostModal';
 import { CampaignDetailModal } from './components/campaign/CampaignDetailModal';
 import { ApplyModal } from './components/campaign/ApplyModal';
-import { CampaignManagement } from './components/campaign/CampaignManagement';
-import { SettingsModal } from './components/common/SettingsModal';
-import { LegalModals } from './components/common/LegalModals';
-
-import { ChatWindow } from './components/chat/ChatWindow';
-import { UserProfileView } from './components/profile/UserProfileView';
 import { PaymentModal } from './components/deal/PaymentModal';
 import { InvoiceModal } from './components/deal/InvoiceModal';
 import { QRCodeModal } from './components/common/QRCodeModal';
-
-import { BottomNav } from './components/layout/BottomNav';
+import { SettingsModal } from './components/common/SettingsModal';
+import { LegalModals } from './components/common/LegalModals';
 
 const MainAppContent = () => {
   const { currentUser, isBusiness, logout } = useAuth();
   
-  // Default view: if user logged in, go to feed. Otherwise public landing page.
-  const [activeView, setActiveView] = useState(() => currentUser ? 'feed' : 'landing');
-  const [chatTargetUserId, setChatTargetUserId] = useState(null);
+  // Navigation View Router
+  const [activeView, setActiveView] = useState('landing');
+  const [viewingProfileUserId, setViewingProfileUserId] = useState(null);
 
-  // MODAL STATES
+  // Modal States
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authInitialMode, setAuthInitialMode] = useState('login');
   
   const [isCreateCampOpen, setIsCreateCampOpen] = useState(false);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
-
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState(null);
-  
+
+  const [chatTargetUserId, setChatTargetUserId] = useState(null);
+
   const [selectedDetailCamp, setSelectedDetailCamp] = useState(null);
   const [selectedApplyCamp, setSelectedApplyCamp] = useState(null);
 
@@ -64,7 +66,7 @@ const MainAppContent = () => {
   const [selectedInvoiceDeal, setSelectedInvoiceDeal] = useState(null);
   const [selectedQRDeal, setSelectedQRDeal] = useState(null);
 
-  const openAuthModal = (mode = 'login', role = 'business') => {
+  const openAuthModal = (mode = 'login') => {
     setAuthInitialMode(mode);
     setIsAuthOpen(true);
   };
@@ -78,6 +80,11 @@ const MainAppContent = () => {
     setActiveView('chat');
   };
 
+  const handleViewProfile = (targetId) => {
+    setViewingProfileUserId(targetId || currentUser?.id || null);
+    setActiveView('profile');
+  };
+
   const handleAuthSuccess = () => {
     setIsAuthOpen(false);
     setActiveView('feed');
@@ -85,6 +92,7 @@ const MainAppContent = () => {
 
   const handleLogout = () => {
     logout();
+    setViewingProfileUserId(null);
     setActiveView('landing');
   };
 
@@ -94,12 +102,17 @@ const MainAppContent = () => {
       {/* STICKY NAVBAR */}
       <Navbar 
         activeView={activeView}
-        setActiveView={setActiveView}
+        setActiveView={(view) => {
+          if (view === 'profile') setViewingProfileUserId(null);
+          setActiveView(view);
+        }}
         openAuthModal={openAuthModal}
         openCreateCampaignModal={() => setIsCreateCampOpen(true)}
         openSettingsModal={() => setIsSettingsOpen(true)}
         onLogoutClick={handleLogout}
         openLegalModal={(type) => setLegalModalType(type)}
+        onOpenChat={handleOpenChat}
+        onViewProfile={handleViewProfile}
       />
 
       {/* DYNAMIC VIEW ROUTER */}
@@ -126,6 +139,7 @@ const MainAppContent = () => {
               openApplyModal={(camp) => setSelectedApplyCamp(camp)}
               onViewDetailClick={(camp) => setSelectedDetailCamp(camp)}
               onChatClick={handleOpenChat}
+              onViewProfile={handleViewProfile}
             />
           </div>
         )}
@@ -163,10 +177,13 @@ const MainAppContent = () => {
           </div>
         )}
 
-        {/* MESSAGES & CHATS */}
+        {/* MESSAGING CHAT WINDOW */}
         {activeView === 'chat' && (
           <div className="animate-fadeIn">
-            <ChatWindow targetUserId={chatTargetUserId} />
+            <ChatWindow 
+              targetUserId={chatTargetUserId} 
+              onViewProfile={handleViewProfile}
+            />
           </div>
         )}
 
@@ -175,6 +192,7 @@ const MainAppContent = () => {
           <div className="animate-fadeIn">
             <TransactionsView 
               openInvoiceModal={(deal) => setSelectedInvoiceDeal(deal)}
+              openQRModal={(deal) => setSelectedQRDeal(deal)}
             />
           </div>
         )}
@@ -189,7 +207,11 @@ const MainAppContent = () => {
         {/* USER PROFILE */}
         {activeView === 'profile' && (
           <div className="animate-fadeIn">
-            <UserProfileView onChatClick={handleOpenChat} />
+            <UserProfileView 
+              userId={viewingProfileUserId || currentUser?.id}
+              onOpenChat={handleOpenChat} 
+              onViewProfile={handleViewProfile}
+            />
           </div>
         )}
 
@@ -210,13 +232,6 @@ const MainAppContent = () => {
           </div>
         )}
 
-        {/* ADMIN PANEL */}
-        {activeView === 'admin' && (
-          <div className="animate-fadeIn">
-            <AdminPanel />
-          </div>
-        )}
-
       </main>
 
       {/* FOOTER */}
@@ -226,7 +241,10 @@ const MainAppContent = () => {
       {currentUser && (
         <BottomNav 
           activeView={activeView}
-          setActiveView={setActiveView}
+          setActiveView={(view) => {
+            if (view === 'profile') setViewingProfileUserId(null);
+            setActiveView(view);
+          }}
           openCreateCampaignModal={() => setIsCreateCampOpen(true)}
           openCreatePostModal={() => setIsCreatePostOpen(true)}
         />

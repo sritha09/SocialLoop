@@ -130,6 +130,7 @@ export const DataProvider = ({ children }) => {
 
     addNotification({
       userId: campaignData.businessId,
+      campaignId: newCamp.id,
       title: 'Campaign Published!',
       message: `Your campaign "${newCamp.title}" is now live for creators.`,
       type: 'campaign'
@@ -143,12 +144,23 @@ export const DataProvider = ({ children }) => {
     setCampaigns(prev => prev.map(c => c.id === campaignId ? { ...c, status: newStatus } : c));
   };
 
+  // COMPLETE CASCADE CAMPAIGN DELETION
   const deleteCampaign = (campaignId) => {
     setCampaigns(prev => prev.filter(c => c.id !== campaignId));
+    setApplications(prev => prev.filter(a => a.campaignId !== campaignId));
+    setDeals(prev => prev.filter(d => d.campaignId !== campaignId));
+    setSavedCampaigns(prev => prev.filter(id => id !== campaignId));
+    setNotifications(prev => prev.filter(n => n.campaignId !== campaignId));
   };
 
   // APPLICATION ACTIONS
   const submitApplication = (appData) => {
+    // Single application constraint per creator/campaign
+    const existing = applications.find(a => a.campaignId === appData.campaignId && a.influencerId === appData.influencerId);
+    if (existing) {
+      return existing;
+    }
+
     const newApp = {
       id: 'app' + Date.now(),
       status: 'Pending',
@@ -163,6 +175,7 @@ export const DataProvider = ({ children }) => {
     if (campaign) {
       addNotification({
         userId: campaign.businessId,
+        campaignId: campaign.id,
         title: 'New Application Received',
         message: `An influencer applied for your campaign "${campaign.title}".`,
         type: 'application'
@@ -197,6 +210,7 @@ export const DataProvider = ({ children }) => {
 
       addNotification({
         userId: app.influencerId,
+        campaignId: campaign?.id,
         title: 'Application Accepted! 🎉',
         message: `Your application for "${campaign?.title || 'campaign'}" has been accepted!`,
         type: 'deal'
@@ -253,6 +267,10 @@ export const DataProvider = ({ children }) => {
     return newPost;
   };
 
+  const deletePost = (postId) => {
+    setPosts(prev => prev.filter(p => p.id !== postId));
+  };
+
   const likePost = (postId, userId) => {
     setPosts(prev => prev.map(p => {
       if (p.id === postId) {
@@ -264,6 +282,7 @@ export const DataProvider = ({ children }) => {
         if (!hasLiked && p.authorId !== userId) {
           addNotification({
             userId: p.authorId,
+            postId: p.id,
             title: 'New Like ❤️',
             message: `Someone liked your post "${p.caption?.slice(0, 30)}..."`,
             type: 'like'
@@ -288,6 +307,7 @@ export const DataProvider = ({ children }) => {
         if (p.authorId !== commentData.authorId) {
           addNotification({
             userId: p.authorId,
+            postId: p.id,
             title: 'New Comment 💬',
             message: `${commentData.authorName}: "${commentData.text?.slice(0, 35)}..."`,
             type: 'comment'
@@ -316,6 +336,7 @@ export const DataProvider = ({ children }) => {
       if (!isFollowing) {
         addNotification({
           userId: targetUserId,
+          senderId: currentUserId,
           title: 'New Follower! 👤',
           message: 'Someone started following your profile on SocialLoop.',
           type: 'follow'
@@ -338,6 +359,7 @@ export const DataProvider = ({ children }) => {
 
     addNotification({
       userId: msgData.receiverId,
+      senderId: msgData.senderId,
       title: 'New Message 💬',
       message: msgData.text.slice(0, 45) + '...',
       type: 'message'
@@ -402,6 +424,7 @@ export const DataProvider = ({ children }) => {
       toggleSaveCampaign,
       posts,
       addPost,
+      deletePost,
       likePost,
       commentPost,
       followingMap,

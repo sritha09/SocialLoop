@@ -19,7 +19,9 @@ export const InfluencerDashboard = ({ setActiveView, openApplyModal, onChatClick
   const activeDeals = myDeals.filter(d => d.status === 'Active');
   const completedDeals = myDeals.filter(d => d.status === 'Completed');
 
-  const totalEarnings = myDeals.reduce((sum, d) => sum + (d.finalPrice || 0), 0);
+  const totalEarnings = myDeals
+    .filter(d => d.status === 'Completed' && d.paymentStatus === 'Completed')
+    .reduce((sum, d) => sum + (d.finalPrice || 0), 0);
 
   const recommendedCampaigns = campaigns.filter(c => 
     c.creatorCategory === currentUser?.category || c.city === currentUser?.city

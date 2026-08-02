@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { 
-  Heart, MessageCircle, Share2, Bookmark, PlusCircle, 
-  MapPin, CheckCircle2, ShieldCheck, Sparkles, TrendingUp, Compass, UserPlus
+  Heart, MessageCircle, Share2, PlusCircle, 
+  MapPin, ShieldCheck, Sparkles, TrendingUp, UserPlus, Trash2 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CreatePostModal } from './CreatePostModal';
 import { PostDetailModal } from './PostDetailModal';
+import { ShareModal } from '../common/ShareModal';
 
-export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onChatClick }) => {
+export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onChatClick, onViewProfile }) => {
   const { currentUser, users } = useAuth();
-  const { posts, campaigns, likePost, commentPost, followUser, followingMap } = useData();
+  const { posts, campaigns, likePost, commentPost, followUser, followingMap, deletePost } = useData();
   const { formatCurrency } = useCurrency();
 
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
+  const [shareTarget, setShareTarget] = useState(null);
 
   const handleCommentSubmit = (postId, e) => {
     e.preventDefault();
@@ -33,85 +35,75 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
     setCommentInputs(prev => ({ ...prev, [postId]: '' }));
   };
 
-  const userCity = (currentUser?.city || 'Hyderabad').toLowerCase();
-  const userCountry = (currentUser?.country || 'India').toLowerCase();
-
-  const isLocationMatch = (item) => {
-    const itemCity = (item.city || '').toLowerCase();
-    const itemCountry = (item.country || '').toLowerCase();
-    return itemCity === userCity || itemCountry === userCountry;
+  const isFollowing = (targetId) => {
+    return (followingMap[currentUser?.id] || []).includes(targetId);
   };
 
-  const suggestedCreators = [...users]
-    .filter(u => u.role === 'influencer' && u.id !== currentUser?.id)
-    .sort((a, b) => (isLocationMatch(b) ? 1 : 0) - (isLocationMatch(a) ? 1 : 0))
-    .slice(0, 4);
+  const suggestedCreators = users.filter(u => u.id !== currentUser?.id && u.role === 'influencer').slice(0, 4);
+  const trendingCampaigns = campaigns.filter(c => c.status === 'Active').slice(0, 4);
 
-  const suggestedBusinesses = [...users]
-    .filter(u => u.role === 'business' && u.id !== currentUser?.id)
-    .sort((a, b) => (isLocationMatch(b) ? 1 : 0) - (isLocationMatch(a) ? 1 : 0))
-    .slice(0, 4);
+  const handleProfileClick = (targetId) => {
+    if (onViewProfile) {
+      onViewProfile(targetId);
+    }
+  };
 
-  const trendingCampaigns = [...campaigns]
-    .sort((a, b) => (isLocationMatch(b) ? 1 : 0) - (isLocationMatch(a) ? 1 : 0))
-    .slice(0, 4);
-
-  const isFollowing = (targetId) => {
-    const list = followingMap[currentUser?.id] || [];
-    return list.includes(targetId);
+  const handleDeletePost = (postId) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      deletePost(postId);
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       
+      {/* MAIN FEED LAYOUT */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* MAIN FEED (LEFT 7 COLUMNS) */}
+        {/* POSTS FEED (LEFT 7 COLUMNS) */}
         <div className="lg:col-span-7 space-y-6">
           
-          {/* CREATE POST PROMPT */}
-          <div className="glass-panel p-4 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm flex items-center gap-3">
+          {/* CREATE POST PROMPT BOX */}
+          <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm flex items-center gap-3">
             <img 
-              src={currentUser?.avatar || currentUser?.logo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300'} 
-              alt={currentUser?.name || 'User'} 
-              className="w-10 h-10 rounded-full object-cover border border-[#6D5EF8]" 
+              src={currentUser?.avatar || currentUser?.logo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'} 
+              alt={currentUser?.name || 'User'}
+              onClick={() => handleProfileClick(currentUser?.id)}
+              className="w-10 h-10 rounded-full object-cover border-2 border-[#6D5EF8] shrink-0 cursor-pointer"
             />
             <button
               onClick={() => setIsCreatePostOpen(true)}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-500 text-xs text-left hover:border-[#6D5EF8] border border-transparent transition-all font-medium"
+              className="w-full text-left px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium hover:bg-slate-200/70 dark:hover:bg-slate-800 transition-colors"
             >
-              Share an update, showcase a campaign, or upload photos/videos...
+              What's on your mind, {currentUser?.name?.split(' ')[0] || 'Creator'}? Share updates, reels or photos...
             </button>
             <button
               onClick={() => setIsCreatePostOpen(true)}
-              className="p-2.5 rounded-xl bg-[#6D5EF8] text-white text-xs font-bold shrink-0 hover:bg-[#5847E0] transition-colors"
+              className="px-4 py-2.5 rounded-xl gradient-button text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-md"
             >
               <PlusCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Post</span>
             </button>
           </div>
 
-          {/* SOCIAL POSTS THREAD OR EMPTY FEED STATE */}
+          {/* POSTS LIST */}
           {posts.length === 0 ? (
-            <div className="p-12 text-center glass-panel rounded-2xl border border-[#ECECF3] dark:border-[#26334D] space-y-4">
-              <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-[#6D5EF8] mx-auto flex items-center justify-center">
-                <Sparkles className="w-8 h-8" />
+            <div className="glass-panel p-12 text-center rounded-2xl border border-[#ECECF3] dark:border-[#26334D] space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#6D5EF8]/10 text-[#6D5EF8] mx-auto flex items-center justify-center">
+                <Sparkles className="w-6 h-6" />
               </div>
-              <div className="space-y-1">
-                <h3 className="text-lg font-black text-slate-900 dark:text-white">No posts yet</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Follow creators or businesses in {currentUser?.city || 'your location'} to see their latest updates, or share your first post!
-                </p>
-              </div>
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-base">No Social Posts Yet</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">Be the first to share an update, reel highlight, or collaboration pitch with the community!</p>
               <button
                 onClick={() => setIsCreatePostOpen(true)}
-                className="px-5 py-2.5 rounded-xl gradient-button text-white font-bold text-xs shadow inline-flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-[#6D5EF8] text-white font-bold text-xs shadow-md inline-flex items-center gap-1.5"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Create First Post</span>
               </button>
             </div>
           ) : (
-            posts.map((post) => {
+            posts.map(post => {
               const hasLiked = post.likedBy?.includes(currentUser?.id);
 
               return (
@@ -125,15 +117,19 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                       <img 
                         src={post.authorAvatar} 
                         alt={post.authorName} 
-                        className="w-10 h-10 rounded-full object-cover border border-[#6D5EF8]" 
+                        onClick={() => handleProfileClick(post.authorId)}
+                        className="w-10 h-10 rounded-full object-cover border border-[#6D5EF8] cursor-pointer hover:scale-105 transition-transform" 
                       />
                       <div>
-                        <h4 className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
+                        <h4 
+                          onClick={() => handleProfileClick(post.authorId)}
+                          className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1 cursor-pointer hover:text-[#6D5EF8] transition-colors"
+                        >
                           {post.authorName}
                           {post.isVerified && <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />}
                         </h4>
                         <p className="text-[11px] text-slate-400 flex items-center gap-1">
-                          <span>{post.authorUsername}</span>
+                          <span onClick={() => handleProfileClick(post.authorId)} className="cursor-pointer hover:text-[#6D5EF8] transition-colors font-semibold">{post.authorUsername}</span>
                           {post.location && (
                             <>
                               <span>•</span>
@@ -145,19 +141,30 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                       </div>
                     </div>
 
-                    {currentUser?.id !== post.authorId && (
-                      <button
-                        onClick={() => followUser(currentUser?.id, post.authorId)}
-                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
-                          isFollowing(post.authorId)
-                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                            : 'bg-[#6D5EF8]/10 text-[#6D5EF8] dark:text-[#8B7CFF] hover:bg-[#6D5EF8] hover:text-white'
-                        }`}
-                      >
-                        <UserPlus className="w-3.5 h-3.5" />
-                        <span>{isFollowing(post.authorId) ? 'Following' : 'Follow'}</span>
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {currentUser?.id === post.authorId ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePost(post.id)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                          title="Delete Post"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => followUser(currentUser?.id, post.authorId)}
+                          className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
+                            isFollowing(post.authorId)
+                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                              : 'bg-[#6D5EF8]/10 text-[#6D5EF8] dark:text-[#8B7CFF] hover:bg-[#6D5EF8] hover:text-white'
+                          }`}
+                        >
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>{isFollowing(post.authorId) ? 'Following' : 'Follow'}</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* POST IMAGES / VIDEO PREVIEW */}
@@ -171,12 +178,12 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                       ) : (
                         <img 
                           src={post.images[0]} 
-                          alt="Post content" 
-                          className="w-full h-auto object-cover max-h-96 group-hover:scale-[1.01] transition-transform" 
+                          alt="Post" 
+                          className="w-full h-auto object-cover max-h-96 group-hover:scale-105 transition-transform duration-300" 
                         />
                       )}
                       {post.images.length > 1 && (
-                        <span className="absolute top-3 right-3 px-2 py-1 rounded-md bg-black/70 text-white font-bold text-[10px]">
+                        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/70 text-white font-bold text-xs backdrop-blur-md">
                           +{post.images.length - 1} photos
                         </span>
                       )}
@@ -200,9 +207,9 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                     )}
                   </div>
 
-                  {/* ACTION BAR (LIKE, COMMENT, SHARE, BOOKMARK) */}
+                  {/* ACTION BAR (LIKE, COMMENT, SHARE) */}
                   <div className="px-4 py-3 border-t border-[#ECECF3] dark:border-[#26334D] flex items-center justify-between text-xs text-slate-500 font-medium">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-5">
                       <button
                         onClick={() => likePost(post.id, currentUser?.id)}
                         className={`flex items-center gap-1.5 transition-colors ${
@@ -221,15 +228,14 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                         <span>{post.commentsCount || 0}</span>
                       </button>
 
-                      <button className="flex items-center gap-1.5 hover:text-[#6D5EF8] transition-colors">
+                      <button 
+                        onClick={() => setShareTarget({ item: post, type: 'post' })}
+                        className="flex items-center gap-1.5 hover:text-[#6D5EF8] transition-colors"
+                      >
                         <Share2 className="w-4 h-4" />
-                        <span>{post.sharesCount || 0}</span>
+                        <span>Share</span>
                       </button>
                     </div>
-
-                    <button className="hover:text-amber-500 transition-colors">
-                      <Bookmark className="w-4 h-4" />
-                    </button>
                   </div>
 
                   {/* COMMENTS LIST */}
@@ -237,7 +243,12 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                     <div className="px-4 pb-3 space-y-2 bg-slate-50/50 dark:bg-slate-900/30 text-xs">
                       {post.comments.slice(0, 2).map(c => (
                         <div key={c.id} className="flex items-start gap-2 pt-1">
-                          <span className="font-bold text-slate-900 dark:text-white shrink-0">{c.authorName}:</span>
+                          <span 
+                            onClick={() => handleProfileClick(c.authorId)}
+                            className="font-bold text-slate-900 dark:text-white shrink-0 cursor-pointer hover:text-[#6D5EF8]"
+                          >
+                            {c.authorName}:
+                          </span>
                           <span className="text-slate-600 dark:text-slate-300">{c.text}</span>
                         </div>
                       ))}
@@ -259,14 +270,19 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
                   >
                     <input 
                       type="text" 
-                      placeholder="Add a comment..."
+                      placeholder="Add a comment..." 
                       value={commentInputs[post.id] || ''}
                       onChange={e => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })}
-                      className="flex-1 bg-transparent outline-none text-slate-900 dark:text-white text-xs"
+                      className="w-full bg-transparent text-slate-900 dark:text-white outline-none py-1"
                     />
-                    <button type="submit" className="font-bold text-[#6D5EF8] hover:underline">Post</button>
+                    <button 
+                      type="submit" 
+                      disabled={!commentInputs[post.id]?.trim()}
+                      className="text-[#6D5EF8] font-bold disabled:opacity-40 hover:underline"
+                    >
+                      Post
+                    </button>
                   </form>
-
                 </div>
               );
             })
@@ -274,10 +290,10 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
 
         </div>
 
-        {/* SIDEBAR SUGGESTIONS (RIGHT 5 COLUMNS) - LOCATION BASED */}
+        {/* SIDEBAR DISCOVERY (RIGHT 5 COLUMNS) */}
         <div className="lg:col-span-5 space-y-6">
           
-          {/* TRENDING CAMPAIGN DISCOVERY */}
+          {/* TRENDING CAMPAIGNS */}
           <div className="glass-panel p-5 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-[#ECECF3] dark:border-[#26334D]">
               <h3 className="font-extrabold text-xs text-slate-900 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
@@ -319,7 +335,7 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
             )}
           </div>
 
-          {/* RECOMMENDED CREATORS (LOCATION BASED) */}
+          {/* RECOMMENDED CREATORS */}
           <div className="glass-panel p-5 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-[#ECECF3] dark:border-[#26334D]">
               <h3 className="font-extrabold text-xs text-slate-900 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
@@ -334,52 +350,30 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
               <div className="space-y-3">
                 {suggestedCreators.map(creator => (
                   <div key={creator.id} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5 truncate">
-                      <img src={creator.avatar} alt={creator.name} className="w-9 h-9 rounded-full object-cover border border-[#6D5EF8]" />
+                    <div 
+                      onClick={() => handleProfileClick(creator.id)}
+                      className="flex items-center gap-2.5 truncate cursor-pointer group"
+                    >
+                      <img 
+                        src={creator.avatar} 
+                        alt={creator.name} 
+                        className="w-9 h-9 rounded-full object-cover border border-[#6D5EF8] shrink-0" 
+                      />
                       <div className="truncate">
-                        <h4 className="font-bold text-slate-900 dark:text-white truncate">{creator.name}</h4>
-                        <p className="text-[11px] text-slate-400 truncate">{creator.city || creator.category}</p>
+                        <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-[#6D5EF8] transition-colors truncate">{creator.name}</h4>
+                        <p className="text-[11px] text-slate-400 truncate">{creator.username || creator.category}</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => onChatClick(creator.id)}
-                      className="px-3 py-1 rounded-xl bg-[#6D5EF8]/10 text-[#6D5EF8] dark:text-[#8B7CFF] font-bold text-xs hover:bg-[#6D5EF8] hover:text-white transition-all shrink-0"
-                    >
-                      Chat
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* RECOMMENDED BUSINESSES (LOCATION BASED) */}
-          <div className="glass-panel p-5 rounded-2xl border border-[#ECECF3] dark:border-[#26334D] shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-[#ECECF3] dark:border-[#26334D]">
-              <h3 className="font-extrabold text-xs text-slate-900 dark:text-white flex items-center gap-1.5 uppercase tracking-wider">
-                <Compass className="w-4 h-4 text-[#6D5EF8]" />
-                <span>Brands ({currentUser?.city || 'Nearby'})</span>
-              </h3>
-            </div>
-
-            {suggestedBusinesses.length === 0 ? (
-              <p className="text-xs text-slate-500 py-3 text-center">No other registered brands yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {suggestedBusinesses.map(biz => (
-                  <div key={biz.id} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2.5 truncate">
-                      <img src={biz.logo} alt={biz.name} className="w-9 h-9 rounded-xl object-cover border border-[#6D5EF8]" />
-                      <div className="truncate">
-                        <h4 className="font-bold text-slate-900 dark:text-white truncate">{biz.name}</h4>
-                        <p className="text-[11px] text-slate-400 truncate">{biz.city}</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => onChatClick(biz.id)}
-                      className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs hover:border-[#6D5EF8] border transition-all shrink-0"
+                    <button
+                      onClick={() => followUser(currentUser?.id, creator.id)}
+                      className={`px-3 py-1 rounded-xl text-[11px] font-bold shrink-0 transition-all ${
+                        isFollowing(creator.id)
+                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                          : 'bg-[#6D5EF8]/10 text-[#6D5EF8] hover:bg-[#6D5EF8] hover:text-white'
+                      }`}
                     >
-                      Contact
+                      {isFollowing(creator.id) ? 'Following' : 'Follow'}
                     </button>
                   </div>
                 ))}
@@ -392,16 +386,30 @@ export const HomeFeed = ({ setActiveView, openApplyModal, onViewDetailClick, onC
       </div>
 
       {/* MODALS */}
-      <CreatePostModal 
-        isOpen={isCreatePostOpen} 
-        onClose={() => setIsCreatePostOpen(false)} 
-      />
+      {isCreatePostOpen && (
+        <CreatePostModal 
+          isOpen={isCreatePostOpen} 
+          onClose={() => setIsCreatePostOpen(false)} 
+        />
+      )}
 
-      <PostDetailModal
-        post={selectedPostForDetail}
-        isOpen={!!selectedPostForDetail}
-        onClose={() => setSelectedPostForDetail(null)}
-      />
+      {selectedPostForDetail && (
+        <PostDetailModal 
+          post={selectedPostForDetail} 
+          isOpen={!!selectedPostForDetail} 
+          onClose={() => setSelectedPostForDetail(null)}
+          onViewProfile={onViewProfile}
+        />
+      )}
+
+      {shareTarget && (
+        <ShareModal 
+          item={shareTarget.item} 
+          type={shareTarget.type} 
+          isOpen={!!shareTarget} 
+          onClose={() => setShareTarget(null)} 
+        />
+      )}
 
     </div>
   );
