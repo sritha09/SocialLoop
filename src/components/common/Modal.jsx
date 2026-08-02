@@ -7,32 +7,47 @@ export const Modal = ({ isOpen, onClose, children, maxWidth = 'max-w-lg' }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // 1. Record exact window scroll position before locking
-      scrollYRef.current = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      // 1. Record exact scrollY position before opening
+      const currentScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      scrollYRef.current = currentScrollY;
       
-      // 2. Capture original body inline styles
+      // 2. Capture element that had focus prior to opening modal
+      const previouslyFocusedElement = document.activeElement;
+
+      // 3. Store original body inline styles
       const originalOverflow = document.body.style.overflow;
       const originalPaddingRight = document.body.style.paddingRight;
 
-      // 3. Compute scrollbar width to prevent horizontal layout shift
+      // 4. Compute scrollbar width compensation
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
-      // 4. Lock scroll exclusively on body element (leave documentElement untouched)
+      // 5. Lock scroll exclusively on body
       document.body.style.overflow = 'hidden';
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
 
       return () => {
-        // 5. Restore original body inline styles
+        // 6. Restore original body inline styles
         document.body.style.overflow = originalOverflow || '';
         document.body.style.paddingRight = originalPaddingRight || '';
 
-        // 6. Instantly restore exact window scroll position
-        window.scrollTo({
-          top: scrollYRef.current,
-          left: 0,
-          behavior: 'instant'
+        // 7. Safely restore focus without triggering browser auto-scroll
+        if (previouslyFocusedElement && typeof previouslyFocusedElement.focus === 'function') {
+          try {
+            previouslyFocusedElement.focus({ preventScroll: true });
+          } catch (e) {
+            // Ignore focus errors if element unmounted
+          }
+        }
+
+        // 8. Defer scroll position restoration to next frame after layout reflow
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: scrollYRef.current,
+            left: 0,
+            behavior: 'instant'
+          });
         });
       };
     }
