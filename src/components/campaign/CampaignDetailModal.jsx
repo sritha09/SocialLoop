@@ -1,11 +1,13 @@
 import React from 'react';
-import { X, MapPin, Calendar, Clock, DollarSign, Users, CheckCircle2, MessageSquare, Send, Globe, ShieldCheck } from 'lucide-react';
+import { MapPin, Calendar, Clock, CheckCircle2, MessageSquare, Send, Globe, ShieldCheck } from 'lucide-react';
 import { InstagramIcon } from '../common/Icons';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { Modal } from '../common/Modal';
 
 export const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplyClick, onChatClick }) => {
   const { users, isInfluencer } = useAuth();
+  const { formatCurrency } = useCurrency();
 
   if (!campaign) return null;
 
@@ -34,14 +36,14 @@ export const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplyClick, o
           
           <div className="absolute bottom-4 left-6 right-6 text-white flex items-end justify-between">
             <div>
-              <span className="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-bold uppercase tracking-wider mb-2 inline-block shadow">
+              <span className="px-3 py-1 rounded-full bg-[#6D5EF8] text-white text-xs font-bold uppercase tracking-wider mb-2 inline-block shadow">
                 {campaign.campaignType} • {campaign.mode || 'Offline'}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black drop-shadow-md">{campaign.title}</h2>
             </div>
             <div className="text-right">
               <span className="text-xs text-slate-300 block">Payout Offer</span>
-              <span className="text-2xl font-black text-emerald-400 drop-shadow">${campaign.budget}</span>
+              <span className="text-2xl font-black text-emerald-400 drop-shadow">{formatCurrency(campaign.budget)}</span>
             </div>
           </div>
         </div>
@@ -53,95 +55,66 @@ export const CampaignDetailModal = ({ campaign, isOpen, onClose, onApplyClick, o
               <img 
                 src={business.logo} 
                 alt={business.name} 
-                className="w-12 h-12 rounded-2xl object-cover border-2 border-indigo-500" 
+                className="w-12 h-12 rounded-2xl object-cover border-2 border-[#6D5EF8]" 
               />
               <div>
                 <h4 className="font-extrabold text-slate-900 dark:text-white text-base flex items-center gap-1.5">
                   {business.name}
                   {business.isVerified && <ShieldCheck className="w-4 h-4 text-emerald-500" />}
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{business.category || campaign.businessCategory} • {campaign.city}, {campaign.state}</p>
+                <p className="text-xs text-slate-500">{business.location}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => handleChatClick(business.id)}
-                className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-xs font-bold hover:bg-amber-500 hover:text-white transition-all flex items-center gap-1.5"
+                type="button"
+                onClick={() => handleChatClick(campaign.businessId)}
+                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-bold text-xs hover:bg-[#6D5EF8] hover:text-white transition-colors flex items-center gap-1.5"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>Chat Business</span>
+                <span>Message Brand</span>
               </button>
+
+              {isInfluencer && (
+                <button
+                  type="button"
+                  onClick={() => { onClose(); onApplyClick(campaign); }}
+                  className="px-5 py-2.5 rounded-xl gradient-button text-white font-bold text-xs shadow-md flex items-center gap-1.5"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Apply Now</span>
+                </button>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3.5 rounded-2xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-white/5">
-              <span className="text-slate-400 block mb-1">Event Date</span>
-              <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-indigo-500" />
-                {campaign.date}
-              </span>
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10">
+              <span className="text-slate-400 block mb-0.5 font-medium">Payout</span>
+              <span className="font-extrabold text-emerald-500 text-sm">{formatCurrency(campaign.budget)}</span>
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-white/5">
-              <span className="text-slate-400 block mb-1">Min Followers</span>
-              <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1">
-                <Users className="w-3.5 h-3.5 text-amber-500" />
-                {(campaign.minFollowers / 1000).toFixed(0)}K+
-              </span>
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10">
+              <span className="text-slate-400 block mb-0.5 font-medium">Category</span>
+              <span className="font-extrabold text-slate-900 dark:text-white">{campaign.businessCategory}</span>
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-white/5">
-              <span className="text-slate-400 block mb-1">Platforms</span>
-              <span className="font-extrabold text-indigo-600 dark:text-indigo-400 truncate block">
-                {campaign.platforms?.join(', ') || 'Instagram'}
-              </span>
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10">
+              <span className="text-slate-400 block mb-0.5 font-medium">Location</span>
+              <span className="font-extrabold text-slate-900 dark:text-white truncate block">{campaign.city}</span>
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-white/5">
-              <span className="text-slate-400 block mb-1">Deadline</span>
-              <span className="font-extrabold text-rose-500 block">
-                {campaign.deadline}
-              </span>
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10">
+              <span className="text-slate-400 block mb-0.5 font-medium">Deadline</span>
+              <span className="font-extrabold text-indigo-500">{campaign.deadline}</span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-bold text-sm text-slate-900 dark:text-white">Campaign Details & Deliverables</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/30 p-4 rounded-2xl border border-slate-200/50 dark:border-white/5">
+            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Campaign Details & Expectations</h4>
+            <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-300">
               {campaign.description}
             </p>
           </div>
 
-          <div className="space-y-2">
-            <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-rose-500" />
-              <span>Venue & Location</span>
-            </h4>
-            <p className="text-xs text-slate-600 dark:text-slate-300">
-              {campaign.venue || business.location || `${campaign.city}, ${campaign.state}`}
-            </p>
-          </div>
-
-          <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex items-center gap-3">
-            {isInfluencer ? (
-              <button
-                onClick={() => { onClose(); onApplyClick(campaign); }}
-                className="w-full py-4 rounded-2xl gradient-bg text-white font-black text-base shadow-xl shadow-indigo-500/30 hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
-              >
-                <Send className="w-5 h-5" />
-                <span>Apply for Campaign (${campaign.budget})</span>
-              </button>
-            ) : (
-              <button
-                onClick={onClose}
-                className="w-full py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm"
-              >
-                Close Preview
-              </button>
-            )}
-          </div>
         </div>
     </Modal>
   );

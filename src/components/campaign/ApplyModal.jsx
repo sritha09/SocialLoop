@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { X, Send, Calendar, DollarSign, Link, Sparkles } from 'lucide-react';
+import { Send, Calendar, Link } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { useCurrency } from '../../context/CurrencyContext';
 
 import { Modal } from '../common/Modal';
 
 export const ApplyModal = ({ campaign, isOpen, onClose }) => {
   const { currentUser } = useAuth();
   const { submitApplication } = useData();
+  const { currentCurrency, formatCurrency } = useCurrency();
 
   const [message, setMessage] = useState(
     `Hi! I'm ${currentUser?.name || 'a creator'} and I would love to collaborate on "${campaign?.title}". My audience matches your target demographic perfectly!`
   );
   const [availableDate, setAvailableDate] = useState(campaign?.date || '2026-08-15');
-  const [expectedPrice, setExpectedPrice] = useState(campaign?.budget || 450);
-  const [portfolioLink, setPortfolioLink] = useState(currentUser?.instagram || 'https://instagram.com/mayacreates');
+  const [expectedPrice, setExpectedPrice] = useState(String(campaign?.budget || '450'));
+  const [portfolioLink, setPortfolioLink] = useState(currentUser?.instagram || '');
 
   if (!campaign) return null;
 
@@ -25,7 +27,7 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
       influencerId: currentUser.id,
       message,
       availableDate,
-      expectedPrice: Number(expectedPrice),
+      expectedPrice: Number(expectedPrice) || 0,
       portfolioLink
     });
     onClose();
@@ -41,7 +43,7 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
             Apply for "{campaign.title}"
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Target Budget: <span className="font-bold text-emerald-500">${campaign.budget}</span> • Venue: {campaign.city}
+            Target Budget: <span className="font-bold text-emerald-500">{formatCurrency(campaign.budget)}</span> • Venue: {campaign.city || 'Location'}
           </p>
         </div>
 
@@ -55,7 +57,7 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
               placeholder="Introduce yourself, mention why you're a great fit, and pitch your content idea..."
               value={message}
               onChange={e => setMessage(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8]"
             ></textarea>
           </div>
 
@@ -69,22 +71,32 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
                   required
                   value={availableDate}
                   onChange={e => setAvailableDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Expected Quote ($ USD) *</label>
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Expected Quote ({currentCurrency.symbol} {currentCurrency.code}) *
+              </label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <span className="absolute left-3 top-2.5 font-bold text-slate-400 text-xs">
+                  {currentCurrency.symbol}
+                </span>
                 <input 
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   required
-                  placeholder="450"
+                  placeholder="Enter quote amount"
                   value={expectedPrice}
-                  onChange={e => setExpectedPrice(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === '' || /^\d*$/.test(val)) {
+                      setExpectedPrice(val);
+                    }
+                  }}
+                  className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8] font-bold"
                 />
               </div>
             </div>
@@ -100,7 +112,7 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
                 placeholder="https://instagram.com/yourhandle"
                 value={portfolioLink}
                 onChange={e => setPortfolioLink(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8]"
               />
             </div>
           </div>
@@ -108,10 +120,10 @@ export const ApplyModal = ({ campaign, isOpen, onClose }) => {
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl gradient-bg text-white font-bold text-sm shadow-xl shadow-indigo-500/30 hover:scale-[1.01] transition-transform flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow-xl flex items-center justify-center gap-2"
             >
               <Send className="w-4 h-4" />
-              <span>Submit Campaign Proposal</span>
+              <span>Submit Campaign Proposal ({currentCurrency.symbol}{expectedPrice || '0'})</span>
             </button>
           </div>
 

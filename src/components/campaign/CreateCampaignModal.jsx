@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { X, PlusCircle, Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Upload, Check, Wand2, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { PlusCircle, Wand2, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
+import { useCurrency } from '../../context/CurrencyContext';
 
 import { Modal } from '../common/Modal';
 
 export const CreateCampaignModal = ({ isOpen, onClose }) => {
   const { currentUser } = useAuth();
   const { createCampaign } = useData();
+  const { currentCurrency } = useCurrency();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -15,13 +17,13 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
     description: '',
     businessCategory: currentUser?.category || 'Cafe & Restaurant',
     state: currentUser?.state || '',
-    city: currentUser?.city || 'Hyderabad',
-    venue: currentUser?.location || 'Hyderabad Flagship Venue',
+    city: currentUser?.city || '',
+    venue: currentUser?.location || '',
     date: '2026-08-20',
     time: '18:00',
     duration: '2 Hours',
     isPaid: true,
-    budget: 500,
+    budget: '500',
     minFollowers: 10000,
     maxFollowers: 150000,
     platforms: ['Instagram'],
@@ -46,24 +48,14 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handlePlatformToggle = (platform) => {
-    setFormData(prev => {
-      const exists = prev.platforms.includes(platform);
-      return {
-        ...prev,
-        platforms: exists ? prev.platforms.filter(p => p !== platform) : [...prev.platforms, platform]
-      };
-    });
-  };
-
   const handleAIGenerate = () => {
     setIsGeneratingAI(true);
     setTimeout(() => {
       setFormData(prev => ({
         ...prev,
-        title: `Exclusive ${prev.businessCategory} Showcase & Tasting Experience`,
-        description: `We are looking for top-tier creators in ${prev.city} to cover our upcoming VIP showcase! Deliverables include 1 high-definition Reel, 3 IG Stories with link stickers, and an honest Google review. Food/Beverages and compensation included.`,
-        budget: 650,
+        title: `Exclusive ${prev.businessCategory || 'Brand'} Showcase Experience`,
+        description: `Looking for top creators to cover our upcoming VIP showcase! Deliverables include 1 Reel, 3 IG Stories, and a review. Food/Beverages and compensation included.`,
+        budget: '650',
         minFollowers: 15000
       }));
       setIsGeneratingAI(false);
@@ -74,7 +66,8 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     createCampaign({
       businessId: currentUser.id,
-      ...formData
+      ...formData,
+      budget: Number(formData.budget) || 0
     });
     onClose();
   };
@@ -140,7 +133,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
             <textarea 
               rows="3"
               required
-              placeholder="Detail what content is expected (e.g. 1 Reel, 3 IG Stories), event details, free products provided, etc."
+              placeholder="Detail expected content (e.g. 1 Reel, 3 IG Stories), event details, perks, etc."
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
               className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[#6D5EF8] font-normal"
@@ -163,6 +156,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
               <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">State</label>
               <input 
                 type="text"
+                placeholder="e.g. Telangana"
                 value={formData.state}
                 onChange={e => setFormData({ ...formData, state: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none"
@@ -173,6 +167,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
               <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">City</label>
               <input 
                 type="text"
+                placeholder="e.g. Hyderabad"
                 value={formData.city}
                 onChange={e => setFormData({ ...formData, city: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none"
@@ -193,7 +188,7 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* DATES, TIME, BUDGET */}
+          {/* DATES, TIME, BUDGET WITH DYNAMIC CURRENCY */}
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <div>
               <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Event / Start Date</label>
@@ -216,15 +211,30 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
               />
             </div>
 
+            {/* DYNAMIC CURRENCY PAYOUT INPUT */}
             <div>
-              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Payout ($ USD)</label>
-              <input 
-                type="number"
-                placeholder="500"
-                value={formData.budget}
-                onChange={e => setFormData({ ...formData, budget: Number(e.target.value) })}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none"
-              />
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Payout ({currentCurrency.symbol} {currentCurrency.code}) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-2.5 font-bold text-slate-400 text-xs">
+                  {currentCurrency.symbol}
+                </span>
+                <input 
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  placeholder="Enter payout amount"
+                  value={formData.budget}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === '' || /^\d*$/.test(val)) {
+                      setFormData({ ...formData, budget: val });
+                    }
+                  }}
+                  className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-white/70 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-[#6D5EF8] font-bold"
+                />
+              </div>
             </div>
 
             <div>
@@ -262,17 +272,17 @@ export const CreateCampaignModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* SUBMIT BUTTON */}
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow mt-2"
+              className="w-full py-3.5 rounded-xl gradient-button text-white font-bold text-sm shadow-xl flex items-center justify-center gap-2"
             >
-              Publish Campaign
+              <span>Publish Campaign Opportunity ({currentCurrency.symbol}{formData.budget || '0'})</span>
             </button>
           </div>
 
         </form>
+
     </Modal>
   );
 };

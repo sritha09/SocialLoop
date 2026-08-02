@@ -1,35 +1,20 @@
 import React from 'react';
-import { X, Printer, Download, Sparkles, ShieldCheck } from 'lucide-react';
+import { Printer, Sparkles, ShieldCheck } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
+import { Modal } from '../common/Modal';
 
 export const InvoiceModal = ({ deal, isOpen, onClose }) => {
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
+  const { formatCurrency } = useCurrency();
 
-  if (!isOpen || !deal) return null;
+  if (!deal) return null;
 
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
-      <div className="relative w-full max-w-2xl glass-panel bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-white/10 my-auto max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-2xl">
         
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-300 hover:text-rose-500 transition-colors print:hidden"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
         {/* INVOICE CONTENT */}
         <div id="printable-invoice" className="space-y-6 text-slate-900 dark:text-white">
           
@@ -40,83 +25,54 @@ export const InvoiceModal = ({ deal, isOpen, onClose }) => {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-black">socialLoop</h3>
+                <h3 className="text-xl font-black">SocialLoop</h3>
                 <p className="text-[10px] text-amber-500 uppercase tracking-widest font-bold">Official Escrow Receipt</p>
               </div>
             </div>
 
             <div className="text-right text-xs">
               <p className="font-bold">INVOICE #{deal.id.toUpperCase()}</p>
-              <p className="text-slate-400">Date: {new Date().toISOString().split('T')[0]}</p>
+              <p className="text-slate-400">Date: {deal.createdAt || new Date().toISOString().split('T')[0]}</p>
             </div>
           </div>
 
-          {/* DEAL PARTICIPANTS */}
-          <div className="grid grid-cols-2 gap-4 text-xs p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/5">
-            <div>
-              <span className="text-slate-400 font-bold uppercase tracking-wider block mb-1">Billed To (Business)</span>
-              <p className="font-extrabold text-sm">Artisan Roast Cafe</p>
-              <p className="text-slate-500">San Francisco, CA</p>
-              <p className="text-slate-500">Tax ID: US-984210349</p>
-            </div>
-
-            <div>
-              <span className="text-slate-400 font-bold uppercase tracking-wider block mb-1">Payee (Creator)</span>
-              <p className="font-extrabold text-sm">Maya Lin (@mayacreates)</p>
-              <p className="text-slate-500">San Francisco, CA</p>
-              <p className="text-slate-500 font-semibold text-emerald-500">Verified Creator Handle</p>
-            </div>
-          </div>
-
-          {/* LINE ITEMS TABLE */}
-          <div className="space-y-2">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-white/10 text-slate-400 font-bold">
-                  <th className="py-2">Deliverable Item</th>
-                  <th className="py-2 text-right">Qty</th>
-                  <th className="py-2 text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                <tr>
-                  <td className="py-3 font-semibold">{deal.deliverables || 'Campaign Sponsorship & Content Creation'}</td>
-                  <td className="py-3 text-right">1 Package</td>
-                  <td className="py-3 text-right font-extrabold">${deal.finalPrice}</td>
-                </tr>
-                <tr>
-                  <td className="py-3 text-slate-500">SocialLoop Platform Escrow Protection Fee</td>
-                  <td className="py-3 text-right">1</td>
-                  <td className="py-3 text-right text-emerald-500 font-bold">$0.00 (Waived)</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div className="pt-4 flex items-center justify-between border-t border-slate-200 dark:border-white/10">
-              <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-bold">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Escrow Status: {deal.paymentStatus || 'Completed'}</span>
+          {/* SUMMARY TABLE */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-white/5 space-y-2 text-xs">
+              <div className="flex items-center justify-between font-bold">
+                <span>Agreed Campaign Deliverables Payout</span>
+                <span className="text-base font-black text-emerald-500">{formatCurrency(deal.finalPrice)}</span>
               </div>
-              <div className="text-right">
-                <span className="text-xs text-slate-400 block">Total Agreed</span>
-                <span className="text-2xl font-black text-emerald-500">${deal.finalPrice}</span>
+              <div className="flex items-center justify-between text-slate-500">
+                <span>Payment Method</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">{deal.paymentMethod || 'Escrow Online'}</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-500">
+                <span>Escrow Status</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">{deal.paymentStatus || 'Completed'}</span>
               </div>
             </div>
           </div>
 
-          {/* FOOTER ACTIONS */}
-          <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-end gap-3 print:hidden">
+          {/* FOOTER VERIFICATION */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-white/10 text-xs">
+            <div className="flex items-center gap-1.5 text-emerald-500 font-bold">
+              <ShieldCheck className="w-4 h-4" />
+              <span>100% Escrow Verified Transaction</span>
+            </div>
+
             <button
+              type="button"
               onClick={handlePrint}
-              className="px-5 py-2.5 rounded-xl gradient-bg text-white font-bold text-xs shadow hover:scale-105 transition-transform flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-bold hover:bg-[#6D5EF8] hover:text-white transition-colors flex items-center gap-1.5 print:hidden"
             >
               <Printer className="w-4 h-4" />
-              <span>Print Invoice / Save PDF</span>
+              <span>Print Invoice Receipt</span>
             </button>
           </div>
 
         </div>
-      </div>
-    </div>
+
+    </Modal>
   );
 };
